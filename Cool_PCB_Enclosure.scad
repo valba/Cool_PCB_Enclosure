@@ -34,7 +34,7 @@ Panel_Type = 0;// [0:Rear, 1:Front]
 
 /* [VISIBILITY] */
 // - InternalBox Visibility
-InternalBox_Visible = 0;// [0:No, 1:Yes]
+InternalBox_Visible = 1;// [0:No, 1:Yes]
 // - CounterShield Visibility
 CounterShield_Visible = 0;// [0:No, 1:Yes]
 // - Panel Visibility
@@ -76,7 +76,7 @@ Main_Text_Panel = 0;// [0:No, 1:Yes]
 // - Epaisseur - Shield thickness  
 Shield_thickness = 6;  //[2:5]
 // - 
-reed_thickness = 2;
+reed_thickness = 4;
 // - 
 rib_thickness = 3;
 
@@ -94,6 +94,18 @@ BPCB3_item = 1;// [0:No, 1:Yes]
 BPCB4_item = 0;// [0:No, 1:Yes]
 // - Power Supply
 SMPS_item = 1;// [0:No, 1:Yes]
+// - Pillar1
+Pillar1_item = 1;// [0:No, 1:Yes]
+// - Pillar1
+Pillar2_item = 1;// [0:No, 1:Yes]
+// - Pillar1
+Pillar3_item = 1;// [0:No, 1:Yes]
+// - Pillar1
+Pillar4_item = 1;// [0:No, 1:Yes]
+// - Pillar1
+Pillar5_item = 1;// [0:No, 1:Yes]
+// - Pillar1
+Pillar6_item = 1;// [0:No, 1:Yes]
 
   
 /* [TOP_SHIELD_ITEMS] */
@@ -122,9 +134,9 @@ PCBFootHole        = 3;
 
 /* [SMPS_FEET_PARAMETERS) ] */
 // - Center X position
-SMPS_PosX         = -55;
+SMPS_PosX         = -55 + 20;
 // - Center Y Position
-SMPS_PosY         = 10;
+SMPS_PosY         = 0;
 // - Longueur PCB - PCB Length
 SMPS_Length       = 49.38;
 // - Largeur PCB - PCB Width
@@ -134,7 +146,7 @@ SMPS_Height      = 50.8;
 
 /* [PCB1_FEET_PARAMETERS) ] */
 // - Center X Position
-PCB1_PosX         = -55;
+PCB1_PosX         = -55 - 20;
 // - Center Y Position
 PCB1_PosY         = 10;
 // - Longueur PCB - PCB Length
@@ -147,11 +159,11 @@ PCB1_Height      = 50.8;
 
 /* [PCB2_FEET_PARAMETERS) ] */
 // - Center X Position
-PCB2_PosX         = 45;
+PCB2_PosX         = 45 - 5;;
 // - Center Y Position
 PCB2_PosY         = -50;
 // - Longueur PCB - PCB Length
-PCB2_Length       = 71;
+PCB2_Length       = 71 - 20;
 // - Largeur PCB - PCB Width
 PCB2_Width        = 52;
 // - Heuteur PCB - PCB height
@@ -160,11 +172,11 @@ PCB2_Height      = 15;
 
 /* [PCB3_FEET_PARAMETERS) ] */
 // - Center X Position
-PCB3_PosX         = 45;
+PCB3_PosX         = 45 - 5;
 // - Center Y Position
 PCB3_PosY         = 50;
 // - Longueur PCB - PCB Length
-PCB3_Length       = 71;
+PCB3_Length       = 71 - 20;
 // - Largeur PCB - PCB Width
 PCB3_Width        = 71;
 // - Heuteur PCB - PCB height
@@ -186,21 +198,29 @@ PCB4_Height      = 25;
 
 /* [PILLAR_PARAMETERS) ] */
 // - Center X Position
-BPillar1_PosX         = -10;
+BPillar1_PosX         = -87;
 // - Center Y Position
 BPillar1_PosY        = 80;
 // - Center X Position
-BPillar2_PosX         = -10;
+BPillar2_PosX         = -87;
 // - Center Y Position
 BPillar2_PosY        = -80;
 // - Center X Position
-BPillar3_PosX         = -10;
+BPillar3_PosX         = 87;
 // - Center Y Position
 BPillar3_PosY        = 80;
 // - Center X Position
-BPillar4_PosX         = -10;
+BPillar4_PosX         = 87;
 // - Center Y Position
 BPillar4_PosY        = -80;
+// - Center X Position
+BPillar5_PosX         = 2;
+// - Center Y Position
+BPillar5_PosY        = -80;
+// - Center X Position
+BPillar6_PosX         = 2;
+// - Center Y Position
+BPillar6_PosY        = 80;
 
 // - Center X Position
 TPillar1_PosX         = - BPillar1_PosX;
@@ -218,6 +238,14 @@ TPillar3_PosY        = BPillar3_PosY;
 TPillar4_PosX         = - BPillar4_PosX;
 // - Center Y Position
 TPillar4_PosY        = BPillar4_PosY;
+// - Center X Position
+TPillar5_PosX         = - BPillar5_PosX;
+// - Center Y Position
+TPillar5_PosY        = BPillar5_PosY;
+// - Center X Position
+TPillar6_PosX         = - BPillar6_PosX;
+// - Center Y Position
+TPillar6_PosY        = BPillar6_PosY;
 
 
 //FAN GRILLE PARAMETERS
@@ -575,7 +603,7 @@ module CText(OnOff, Tx, Ty, Font, Size, TxtRadius, Angl, Turn, Content){
 module bottom_shield(active, visible) { 
     if (active == 1){
       bshield(bottom_active = 1, bottom_visible=0);
-//        rotate([0,180,0]) tshield(top_active = 1, top_visible=0); //Uncomment in order to visualize both shields matched.
+        //rotate([0,180,0]) tshield(top_active = 1, top_visible=0); //Uncomment in order to visualize both shields matched.
     }
     else
       if (visible == 1) %bshield(bottom_active = 0, bottom_visible = 1);
@@ -717,25 +745,33 @@ module tshield(top_active, top_visible) {
 
     echo("START PILLARS..."); 
     //Holes for pillars
-    translate([TPillar1_PosX, TPillar1_PosY, -Box_Height/2])
+    if (Pillar1_item) translate([TPillar1_PosX, TPillar1_PosY, -Box_Height/2])
     cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
-    translate([TPillar2_PosX, TPillar2_PosY, -Box_Height/2])
+    if (Pillar2_item) translate([TPillar2_PosX, TPillar2_PosY, -Box_Height/2])
     cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
-    translate([TPillar3_PosX, TPillar3_PosY, -Box_Height/2])
+    if (Pillar3_item) translate([TPillar3_PosX, TPillar3_PosY, -Box_Height/2])
     cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
-    translate([TPillar4_PosX, TPillar4_PosY, -Box_Height/2])
+    if (Pillar4_item) translate([TPillar4_PosX, TPillar4_PosY, -Box_Height/2])
+    cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
+    if (Pillar5_item) translate([TPillar5_PosX, TPillar5_PosY, -Box_Height/2])
+    cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
+    if (Pillar6_item) translate([TPillar6_PosX, TPillar6_PosY, -Box_Height/2])
     cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
   }//fin de difference holes
 
   //PILLARS
-  translate([TPillar1_PosX, TPillar1_PosY, -Box_Height/2])
-  Bpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
-  translate([TPillar2_PosX, TPillar2_PosY, -Box_Height/2])
-  Bpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
-  translate([TPillar3_PosX, TPillar3_PosY, -Box_Height/2])
-  Bpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
-  translate([TPillar4_PosX, TPillar4_PosY, -Box_Height/2])
-  Bpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
+  if (Pillar1_item) translate([TPillar1_PosX, TPillar1_PosY, -Box_Height/2])
+  Tpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
+  if (Pillar2_item) translate([TPillar2_PosX, TPillar2_PosY, -Box_Height/2])
+  Tpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
+  if (Pillar3_item) translate([TPillar3_PosX, TPillar3_PosY, -Box_Height/2])
+  Tpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
+  if (Pillar4_item) translate([TPillar4_PosX, TPillar4_PosY, -Box_Height/2])
+  Tpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
+  if (Pillar5_item) translate([TPillar5_PosX, TPillar5_PosY, -Box_Height/2])
+  Tpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
+  if (Pillar6_item) translate([TPillar6_PosX, TPillar6_PosY, -Box_Height/2])
+  Tpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
 
   echo("--> END PILLARS");
     
@@ -895,24 +931,32 @@ module bshield(bottom_active, bottom_visible) {
 
     echo("START PILLARS..."); 
     //Holes for pillars
-    translate([BPillar1_PosX, BPillar1_PosY, -Box_Height/2])
+    if (Pillar1_item) translate([BPillar1_PosX, BPillar1_PosY, -Box_Height/2])
     cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
-    translate([BPillar2_PosX, BPillar2_PosY, -Box_Height/2])
+    if (Pillar2_item) translate([BPillar2_PosX, BPillar2_PosY, -Box_Height/2])
     cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
-    translate([BPillar3_PosX, BPillar3_PosY, -Box_Height/2])
+    if (Pillar3_item) translate([BPillar3_PosX, BPillar3_PosY, -Box_Height/2])
     cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
-    translate([BPillar4_PosX, BPillar4_PosY, -Box_Height/2])
+    if (Pillar4_item) translate([BPillar4_PosX, BPillar4_PosY, -Box_Height/2])
+    cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
+    if (Pillar5_item) translate([BPillar5_PosX, BPillar5_PosY, -Box_Height/2])
+    cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
+    if (Pillar6_item) translate([BPillar6_PosX, BPillar6_PosY, -Box_Height/2])
     cylinder(d = 11 - 0.001, h = Box_Height + Shield_thickness, $fn=64);
   }//fin de difference holes
 
   //PILLARS
-  translate([BPillar1_PosX, BPillar1_PosY, -Box_Height/2])
+  if (Pillar1_item) translate([BPillar1_PosX, BPillar1_PosY, -Box_Height/2])
   Bpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
-  translate([BPillar2_PosX, BPillar2_PosY, -Box_Height/2])
+  if (Pillar2_item) translate([BPillar2_PosX, BPillar2_PosY, -Box_Height/2])
   Bpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
-  translate([BPillar3_PosX, BPillar3_PosY, -Box_Height/2])
+  if (Pillar3_item) translate([BPillar3_PosX, BPillar3_PosY, -Box_Height/2])
   Bpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
-  translate([BPillar4_PosX, BPillar4_PosY, -Box_Height/2])
+  if (Pillar4_item) translate([BPillar4_PosX, BPillar4_PosY, -Box_Height/2])
+  Bpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
+  if (Pillar5_item) translate([BPillar5_PosX, BPillar5_PosY, -Box_Height/2])
+  Bpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
+  if (Pillar6_item) translate([BPillar6_PosX, BPillar6_PosY, -Box_Height/2])
   Bpillar(pillar_height = Box_Height/2 - Shield_thickness, ext_diameter = 11, int_diameter = 4, base_hole_diameter = 8, base_hole_height = 9, pillar_filet = 12);    
 
   echo("--> END PILLARS");
@@ -1390,19 +1434,22 @@ module Bpillar(pillar_height, ext_diameter, int_diameter, base_hole_diameter, ba
 
 // - TPILLAR
 module Tpillar(pillar_height, ext_diameter, int_diameter, base_hole_diameter, base_hole_height, filet){
-  translate([0, 0, 0])
+  rotate([0, 0, 0])
      difference() {
-        cylinder(d = ext_diameter + filet, h = pillar_height + Shield_thickness, $fn=64);
+        cylinder(d = ext_diameter + pillar_filet, h = pillar_height + Shield_thickness, $fn=64);
         rotate_extrude($fn = 64) {
-          translate([(ext_diameter + filet * 2)/2, filet + Shield_thickness, 0]) {
+          translate([(ext_diameter + pillar_filet * 2)/2, pillar_filet + Shield_thickness, 0]) {
             minkowski(){
               square(Box_Height/2);
-              circle(filet, $fn=64);
+              circle(pillar_filet, $fn=64);
             }
           }
         }
+    cylinder(d = int_diameter, h = pillar_height + Shield_thickness, $fn=64);
+    color("red") 
+      translate([0, 0, - (base_hole_height + Shield_thickness)/2])
+        cylinder(d = base_hole_diameter, h = base_hole_height + Shield_thickness, $fn=64);
     }
-  
 } 
 
 
