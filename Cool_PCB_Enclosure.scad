@@ -50,6 +50,24 @@ Box_Width = 210;
 Box_Height = 105;  
 
 
+/* [INTERNAL_BOX_DIMENSIONS] */
+// - Epaisseur - Shield thickness  
+Shield_thickness = 4;  
+// - 
+reed_thickness = 4;
+// - 
+reed_hexagon_diameter =20;
+// - 
+honeycomb_hexagon_thickness = 2;
+// - 
+honeycomb_height = 3;
+// - 
+rear_hexagon_diameter = 10;
+// -
+rear_hexagon_thickness = 3;
+
+
+
 /* [EXTERNAL_BOX_PARAMETERS) ] */
 // - Decorations to ventilation holes
 Vent          = 1;// [0:No, 1:Yes]
@@ -71,16 +89,6 @@ m             = 0.9;
 Main_Text_Panel = 0;// [0:No, 1:Yes]
 // - Panneau avant - Front panel
 
-
-/* [INTERNAL_BOX_DIMENSIONS] */
-// - Epaisseur - Shield thickness  
-Shield_thickness = 6;  //[2:5]
-// - 
-reed_thickness = 4;
-// - 
-rib_thickness = 2;
-
-rib_height = 3;
 
   
 /* [BOTTOM_SHIELD_ITEMS] */
@@ -484,16 +492,16 @@ echo("START RAILS ...");
       //external rail
       difference() {
         rounded_cube(length = Box_Length, width = Box_Width, height = Box_Height, radius =Fillet);
-        rounded_cube(length = Box_Length - 2*rib_thickness, width = Box_Width, height = Box_Height, radius = Fillet);
+        rounded_cube(length = Box_Length - 2*honeycomb_hexagon_thickness, width = Box_Width, height = Box_Height, radius = Fillet);
       } //di (external rail)
 
       //internal rail
       difference(){        
-        rounded_cube(length = Box_Length - 2*rib_thickness - 2*Shield_thickness + 0.001, width = Box_Width - 2*Shield_thickness + 0.001, height = Box_Height - 2*Shield_thickness + 0.001, radius = Fillet);
-        rounded_cube(length = Box_Length - 4*rib_thickness - 2*Shield_thickness, width = Box_Width - 2*Shield_thickness, height = Box_Height - 2*Shield_thickness, radius = Fillet);
+        rounded_cube(length = Box_Length - 2*honeycomb_hexagon_thickness - 2*Shield_thickness + 0.001, width = Box_Width - 2*Shield_thickness + 0.001, height = Box_Height - 2*Shield_thickness + 0.001, radius = Fillet);
+        rounded_cube(length = Box_Length - 4*honeycomb_hexagon_thickness - 2*Shield_thickness, width = Box_Width - 2*Shield_thickness, height = Box_Height - 2*Shield_thickness, radius = Fillet);
       } //di (internal rail)              
     } //un
-    rounded_cube(length = Box_Length + 1, width = Box_Width - 2*Shield_thickness - 2*rib_height, height = Box_Height - 2*Shield_thickness - 2*rib_height, radius = Fillet);
+    rounded_cube(length = Box_Length + 1, width = Box_Width - 2*Shield_thickness - 2*honeycomb_height, height = Box_Height - 2*Shield_thickness - 2*honeycomb_height, radius = Fillet);
   } //di        
 echo("--> END RAILS");
 } //mo
@@ -514,8 +522,8 @@ module shield(){
   external_YPos = Box_Height - 2*Fillet;
   external_Pos = square_vertices(external_XPos, external_YPos);
 
-  internal_XPos = Box_Width - 2*Fillet - 2*rib_height - 2*Shield_thickness;
-  internal_YPos = Box_Height - 2*Fillet - 2*rib_height - 2*Shield_thickness;
+  internal_XPos = Box_Width - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness;
+  internal_YPos = Box_Height - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness;
   internal_Pos = square_vertices(internal_XPos, internal_YPos);
 echo(external_Pos);
   echo(internal_Pos);
@@ -525,13 +533,13 @@ echo(external_Pos);
     for (i = [0 : 3] ){
       translate([external_Pos[i][0], 0, external_Pos[i][1]]) 
         rotate([90, 360/16, 0])
-          cylinder(r = Fillet, h = Box_Length - 4*rib_thickness - 2*Shield_thickness, center = true, $fn = 8);
+          cylinder(r = Fillet, h = Box_Length - 4*honeycomb_hexagon_thickness - 2*Shield_thickness, center = true, $fn = 8);
     } //fo
      
     for (i = [0 : 3] ){
       translate([internal_Pos[i][0], 0, internal_Pos[i][1]]) 
         rotate([90, 360/16, 0])
-          cylinder(r = Fillet + rib_height/2, h = Box_Length + 1, center = true, $fn = 8);
+          cylinder(r = Fillet + honeycomb_height/2, h = Box_Length + 1, center = true, $fn = 8);
     } //fo
   } //di
 } //mo
@@ -539,9 +547,22 @@ echo(external_Pos);
 
 module hex_mesh(){
 echo("START HEX MESH ...");
-  translate([0, 0, -Box_Height/2 + Shield_thickness + rib_height/2]) hexa_grid(hexagon_radius = 10 , hexagon_thickness = 0, area_width = Box_Width - 2*Shield_thickness, area_length = Box_Length - 4*rib_thickness - 2*Shield_thickness, area_height = rib_height);
-  translate([-Box_Width/2 + Shield_thickness + rib_height/2, 0, 0]) rotate([0, 90, 0]) hexa_grid(hexagon_radius = 10 , hexagon_thickness = 0, area_width = Box_Height - 2*Shield_thickness, area_length = Box_Length - 4*rib_thickness - 2*Shield_thickness, area_height = rib_height);
-  translate([Box_Width/2 - Shield_thickness - rib_height/2, 0, 0]) rotate([0, 90, 0]) hexa_grid(hexagon_radius = 10 , hexagon_thickness = 0, area_width = Box_Height - 2*Shield_thickness, area_length = Box_Length - 4*rib_thickness - 2*Shield_thickness, area_height = rib_height);
+  rhd = reed_hexagon_diameter;
+  hht = honeycomb_hexagon_thickness;
+  hh = honeycomb_height;
+
+    h_area = [Box_Width - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
+  translate([0, 0, -Box_Height/2 + Shield_thickness + hh/2]) 
+    hexagonal_grid(box = h_area, hexagon_diameter = 2/sqrt(3)*rhd - hht, hexagon_thickness = hht);
+
+    v_area1 = [Box_Height - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
+    echo(v_area1);
+  translate([-Box_Width/2 + Shield_thickness + hh/2, 0, 0]) rotate([0, 90, 0]) 
+    hexagonal_grid(box = v_area1, hexagon_diameter = 2/sqrt(3)*rhd - hht, hexagon_thickness = hht);
+
+    v_area2 = [Box_Height - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
+  translate([Box_Width/2 - Shield_thickness - hh/2, 0, 0]) rotate([0, 90, 0]) 
+    hexagonal_grid(box = v_area2, hexagon_diameter = 2/sqrt(3)*rhd - hht, hexagon_thickness = hht);
   echo("--> END HEX MESH");
 } //mo            
 
@@ -549,43 +570,71 @@ echo("START HEX MESH ...");
 module reeds(){
 echo("START REEDS ..."); 
   // Reeds
-  hexagon_diameter = 20;
-  modulo = (Box_Length - 6*Shield_thickness) % hexagon_diameter;
-  total_num = ((Box_Length - 6*Shield_thickness) - modulo) / hexagon_diameter;
+  modulo = (Box_Length - 6*Shield_thickness) % reed_hexagon_diameter;
+  total_num = ((Box_Length - 6*Shield_thickness) - modulo) / reed_hexagon_diameter;
   difference() {        // Fixation box legs
     union() {
       for (i = [1 : total_num]) {
         //color("red") 
-        translate([(- Box_Width)/2 + Shield_thickness + reed_thickness/2, (Box_Length - 6*Shield_thickness - modulo - hexagon_diameter)/2 - (i - 1) * hexagon_diameter , 0])
+        translate([(- Box_Width)/2 + Shield_thickness + reed_thickness/2, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter , 0])
           rotate([90, 0, 90])
             difference() {
-              cylinder(d = hexagon_diameter + 0.001, h = reed_thickness, center = true, $fn=6);
+              cylinder(d = reed_hexagon_diameter + 0.001, h = reed_thickness, center = true, $fn=6);
               if ( (i == 1) || (i == total_num) || (i == (total_num - total_num%2)/2 + 1) ) {  
                 translate ([0, 4, 0]) cylinder(d = 2, h = reed_thickness, center = true, $fn=64);
               }
             } //di
       } //fo
     } //un
-    angle = atan(2*reed_thickness / hexagon_diameter);  
-    translate([- Box_Width/2 + Shield_thickness + reed_thickness/2, 0, - hexagon_diameter/2])
+    angle = atan(2*reed_thickness / reed_hexagon_diameter);  
+    translate([- Box_Width/2 + Shield_thickness + reed_thickness/2, 0, - reed_hexagon_diameter/2])
       //color("blue")
       rotate([0, angle, 0]) 
-        cube([reed_thickness, (Box_Length - 6*Shield_thickness - modulo), hexagon_diameter], center = true);
+        cube([reed_thickness, (Box_Length - 6*Shield_thickness - modulo), reed_hexagon_diameter], center = true);
   }//di (Fixation box legs)
 echo("--> END REEDS"); 
 } //mo
 
 
+module antireeds(){
+echo("START ANTI-REEDS ..."); 
+  // Reeds
+  modulo = (Box_Length - 6*Shield_thickness) % reed_hexagon_diameter;
+  total_num = ((Box_Length - 6*Shield_thickness) - modulo) / reed_hexagon_diameter;
+  difference() {        // Fixation box legs
+    union() {
+      for (i = [1 : total_num]) {
+        //color("red") 
+        translate([(Box_Width)/2 - Shield_thickness - reed_thickness/2, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter , 0])
+// cube([reed_thickness, reed_hexagon_diameter * total_num, reed_hexagon_diameter], center = true );
+                   rotate([90, 0, 90])
+ //           difference() {
+              cylinder(d = reed_hexagon_diameter + honeycomb_hexagon_thickness, h = reed_thickness, center = true, $fn=6);
+ //             if ( (i == 1) || (i == total_num) || (i == (total_num - total_num%2)/2 + 1) ) {  
+   //             translate ([0, 4, 0]) cylinder(d = 2, h = reed_thickness, center = true, $fn=64);
+   //           }
+    //        } //di
+      } //fo
+    } //un
+//    angle = atan(2*reed_thickness / reed_hexagon_diameter);  
+//    translate([- Box_Width/2 + Shield_thickness + reed_thickness/2, 0, - reed_hexagon_diameter/2])
+      //color("blue")
+//      rotate([0, angle, 0]) 
+//        cube([reed_thickness, (Box_Length - 6*Shield_thickness - modulo), reed_hexagon_diameter], center = true);
+  }//di (Fixation box legs)
+echo("--> END ANTI-REEDS"); 
+} //mo
+
+
 module pegs(){
-      hexagon_diameter = 20;
-      modulo = (Box_Length - 6*Shield_thickness) % hexagon_diameter;
-      total_num = ((Box_Length - 6*Shield_thickness) - modulo) / hexagon_diameter;
+      modulo = (Box_Length - 6*Shield_thickness) % reed_hexagon_diameter;
+      total_num = ((Box_Length - 6*Shield_thickness) - modulo) / reed_hexagon_diameter;
 echo("START PEGS ..."); 
 // Edge's pegs
   for (i = [1 : total_num]) {
     if ( (i == 1) || (i == total_num) || (i == (total_num - total_num%2)/2 + 1) ) {  
           color("blue") 
-      translate([(Box_Width/2 - Shield_thickness/2), (Box_Length - 6*Shield_thickness - modulo - hexagon_diameter)/2 - (i - 1) * hexagon_diameter, 0])
+      translate([(Box_Width/2 - Shield_thickness/2), (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter, 0])
         sphere (r = Shield_thickness/4, center = true, $fn=64); 
     }
   } //fo
@@ -593,17 +642,16 @@ echo("--> END PEGS");
 } //mo
 
 
-//module antipegs(total_num, hexagon_diameter, modulo){
+//module antipegs(total_num, reed_hexagon_diameter, modulo){
 module antipegs(){
-      hexagon_diameter = 20;
-      modulo = (Box_Length - 6*Shield_thickness) % hexagon_diameter;
-      total_num = ((Box_Length - 6*Shield_thickness) - modulo) / hexagon_diameter;
+      modulo = (Box_Length - 6*Shield_thickness) % reed_hexagon_diameter;
+      total_num = ((Box_Length - 6*Shield_thickness) - modulo) / reed_hexagon_diameter;
 echo("START ANTI-PEGS ..."); 
 // Edge's anti-pegs
   for (i = [1 : total_num]) {
     if ( (i == 1) || (i == total_num) || (i == (total_num - total_num%2)/2 + 1) ) {  
       color("blue") 
-        translate([-(Box_Width/2 - Shield_thickness/2), (Box_Length - 6*Shield_thickness - modulo - hexagon_diameter)/2 - (i - 1) * hexagon_diameter, 0])
+        translate([-(Box_Width/2 - Shield_thickness/2), (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter, 0])
           cylinder(d = Shield_thickness/2, h = 2 * Shield_thickness, center = true, $fn=64); 
     }
   } //fo
@@ -613,9 +661,8 @@ echo("--> END ANTI-PEGS");
 
 module ventilation_holes(){      
 echo("START VENTILATION HOLES ..."); 
-      hexagon_diameter = 20;
-      modulo = (Box_Length - 6*Shield_thickness) % hexagon_diameter;
-      total_num = ((Box_Length - 6*Shield_thickness) - modulo) / hexagon_diameter;
+      modulo = (Box_Length - 6*Shield_thickness) % reed_hexagon_diameter;
+      total_num = ((Box_Length - 6*Shield_thickness) - modulo) / reed_hexagon_diameter;
       // Ventilation Holes
       rotate ([0, 0, 90]) 
         union() {
@@ -636,7 +683,7 @@ echo("START VENTILATION HOLES ...");
         for (i = [1 : total_num]) {
           if ( (i == 1) || (i == total_num) || (i == (total_num - total_num%2)/2 + 1) ) { 
             color("red") 
-              translate([Box_Width/2 - Shield_thickness, (Box_Length - 6*Shield_thickness - modulo - hexagon_diameter)/2 - (i - 1) * hexagon_diameter, -4])
+              translate([Box_Width/2 - Shield_thickness, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter, -4])
                rotate([90, 0, 90])
                  cylinder(d = 2, h = 2*Shield_thickness, center = true, $fn=64); 
           }
@@ -942,8 +989,8 @@ module tshield(top_active, top_visible) {
                 echo("START RAILS ..."); 
              //long Rails
               difference(){        
-                rounded_cube(Box_Length - 2*rib_thickness - 2*Shield_thickness + 0.001, Box_Width - 2*Shield_thickness + 0.001, Box_Height - 2*Shield_thickness + 0.001, Fillet);
-                rounded_cube(Box_Length - 4*rib_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness, Fillet);
+                rounded_cube(Box_Length - 2*honeycomb_hexagon_thickness - 2*Shield_thickness + 0.001, Box_Width - 2*Shield_thickness + 0.001, Box_Height - 2*Shield_thickness + 0.001, Fillet);
+                rounded_cube(Box_Length - 4*honeycomb_hexagon_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness, Fillet);
               }
               echo("--> END RAILS"); 
             }
@@ -959,7 +1006,7 @@ module tshield(top_active, top_visible) {
             }
           }
           // Rail height
-          rounded_cube(Box_Length + Shield_thickness, Box_Width - 6*rib_thickness, Box_Height - 6*rib_thickness, Fillet);
+          rounded_cube(Box_Length + Shield_thickness, Box_Width - 6*honeycomb_hexagon_thickness, Box_Height - 6*honeycomb_hexagon_thickness, Fillet);
         }
         echo("START REEDS ..."); 
         // Reeds
@@ -1130,6 +1177,7 @@ module tshield(top_active, top_visible) {
           translate([0, 0, Box_Height/2])
             cube ([Box_Width, Box_Length, Box_Height], center = true);
           echo("--> END HALF"); 
+          antireeds();
           //Fan Hole
           if (TFan_Grill_item == 1) {
             translate([FanPosX,  FanPosY, - Box_Height/2])
@@ -1169,7 +1217,8 @@ module bshield(bottom_active, bottom_visible) {
           translate([0, 0, Box_Height/2])
             cube ([Box_Width, Box_Length, Box_Height], center = true);
           echo("--> END HALF"); 
-          //Fan Hole
+          antireeds();
+        //Fan Hole
           if (BFan_Grill_item == 1) {
             translate([FanPosX,  FanPosY, - Box_Height/2])
             cylinder(r = FanDia/2, h = 2*Shield_thickness);
@@ -1432,51 +1481,70 @@ function incenter(A, B, C) = (A * distance(B, C) + B * distance(C, A) + C * dist
 function roundvertex(A, B, C, r) = B + (unitv(incenter(A, B, C) - B) * r / sin(anglev(B - A, B - C)/2)); 
 
 
-// * HEXAGONAL GRID
-// - HEXGRID
-/* an array of hexagons. subtract to make it hexagonal holes */
-module hexgrid(r, t, w, l, h) {
-  $fn = 6;
-  dv = 2 * (r + t);
-  dh = 2 * 2 * (r + t) * cos(30);
+// * HONEYCOMB
 
-  for (x = [0 : w/dh + 1])
-    for (y = [0 : l/dv + 1])
-      translate([x*dh - w/2 -  3 * sqrt(3)/2 * (w % dh) / dh , y*dv - l/2, 0]){
-      cylinder(h = h, r = r, center = true);
-      //cylinder(h = h, r = r, center = true, $fn=120);
-      }
-  for (x = [0 : w/dh + 0])
-    for (y = [0 : l/dv + 0])
-      translate([x*dh - w/2 + dh/2  - 3 * sqrt(3)/2 * (w % dh) / dh, y*dv -l/2 +dv/2,0]){
-      cylinder(h = h, r = r, center = true);
-      //cylinder(h = t, r = r, center = true, $fn=120);
-      }
+module hexagonal_grid(box, hexagon_diameter, hexagon_thickness){
+// first arg is vector that defines the bounding box, length, width, height
+// second arg in the 'diameter' of the holes. In OpenScad, this refers to the corner-to-corner diameter, not flat-to-flat
+// this diameter is 2/sqrt(3) times larger than flat to flat
+// third arg is wall thickness.  This also is measured that the corners, not the flats. 
+
+// example hexagonal_grid([25, 25, 5], 2.71, 0.133);
+
+    difference(){
+        cube(box, center = true);
+        hexgrid(box, hexagon_diameter, hexagon_thickness + 0.001);
+    }
 }
 
 
-// - HEXA_GRID
-module hexa_grid(hexagon_radius, hexagon_thickness, area_width, area_length, area_height) {
-  difference() {
-    cube([area_width, area_length, area_height], center = true);
-    hexgrid(r = hexagon_radius, t = hexagon_thickness, w = area_width, l = area_length , h = area_height);
-  }
+module hex_hole(hexdiameter, height){
+        translate([0, 0, 0]) rotate([0, 0, 0]) cylinder(d = hexdiameter, h = height + 0.001, center = true, $fn = 6);
 }
+
+
+module hexgrid(box, hexagon_diameter, hexagon_thickness) {
+    a = (hexagon_diameter + hexagon_thickness)*sin(60);
+    cos60 = cos(60);
+    sin60 = sin(60);
+    
+    moduloX = (box[0] % hexagon_diameter);
+    numX = (box[0] - moduloX) / hexagon_diameter;
+    oddX = numX % 2;
+    numberX = numX + oddX;
+
+    moduloY = (box[1] % hexagon_diameter);
+    numY = (box[1] - moduloY) / hexagon_diameter;
+    oddY = numY % 2;
+    numberY = numY + oddY;
+
+    x0 = (numberX + 2) * (hexagon_diameter + hexagon_thickness)/2;
+    y0 = (numberY + 2) * (hexagon_diameter + hexagon_thickness)*sqrt(3)/2/2;
+
+
+    for(x = [-x0: 2*a*sin60 : x0]) {
+        for(y = [-y0 : a : y0]) {
+            translate([x, y, 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2]);
+           translate([x + a*sin60, y + a*cos60 , 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2]);
+        }
+    }
+}
+
+
 
 // * PANELS
 // - FRONT PANEL
 module front_panel(active, visible) {
   union() {
     if (active == 1)
-      translate([0, - Box_Length/2 + rib_thickness + m/2, 0]) 
+      translate([0, - Box_Length/2 + honeycomb_hexagon_thickness + m/2, 0]) 
         rotate([90, 0, 0])
         FPanel();
     else
       if (visible == 1)
-        translate([0, - Box_Length/2 + rib_thickness + m/2, 0]) 
+        translate([0, - Box_Length/2 + honeycomb_hexagon_thickness + m/2, 0]) 
         rotate([90, 0, 0])
           %FPanel();
- 
   }    
   echo("*** END FRONT PANEL ***"); 
 }
@@ -1485,12 +1553,12 @@ module front_panel(active, visible) {
 module rear_panel(active, visible) {
   union() {
     if (active == 1)
-      translate([0, + Box_Length/2 - rib_thickness - m/2, 0]) 
+      translate([0, + Box_Length/2 - honeycomb_hexagon_thickness - m/2, 0]) 
         rotate([-90, 180, 0])
         RPanel();
     else
       if (visible == 1)
-        translate([0, + Box_Length/2 - rib_thickness - m/2, 0]) 
+        translate([0, + Box_Length/2 - honeycomb_hexagon_thickness - m/2, 0]) 
         rotate([-90, 180, 0])
           %RPanel();
  
@@ -1549,54 +1617,28 @@ module FPanel(){
 
 // - RPANEL
 module RPanel(){
-  echo("START REAR PANEL ..."); 
-    panel_height = Box_Height -2*Shield_thickness - m;
-    panel_length = Box_Width - 2*Shield_thickness - m;
-    panel_thickness = Shield_thickness - m;
-    difference(){
-        color(Couleur2)
-        //Panel(Length,Width,Thick,Fillet);
-        //translate([0, 0, -panel_height/2]) 
-        rotate([90, 0, 0])
-        rounded_cube(panel_thickness, panel_length, panel_height, Fillet);
-    
-//    translate([0, 0, 0 ])
-    rotate([0,0,0]){
-        color(Couleur2){
-//                     <- Cutting shapes from here ->  
-        translate([50, 0, 0])    
-            rounded_trapezoid(hexagon_vertices(r = 25), Shield_thickness + 1, 5);
-  //  cylinder(d = 50, h = Shield_thickness, center =true, $fn = 6);
-            translate([-50, -20, 0])    
-            rounded_trapezoid(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10, 2);
+echo("START REAR PANEL ..."); 
+color(Couleur2){    
+  panel_height = Box_Height -2*Shield_thickness - m;
+  panel_length = Box_Width - 2*Shield_thickness - m;
+  panel_thickness = Shield_thickness - m;
+  difference(){
+    rotate([90, 0, 0])
+      rounded_cube(panel_thickness, panel_length, panel_height, Fillet);
+    translate([50, 0, 0])    
+      rounded_trapezoid(hexagon_vertices(r = 25), Shield_thickness + 1, 5);
+    translate([-50, -20, 0])    
+      rounded_trapezoid(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10, 2);
+  } //di
 
- //                            <- To here -> 
-           }
-       }
-   }
-  echo("---> END REAR PANEL"); 
-
-        translate([50, 0, 0])    
-intersection(){
+  translate([50, 0, 0])    
+  intersection(){
     rounded_trapezoid(hexagon_vertices(r = 25), Shield_thickness + 1, 5);
-//      cylinder(r = 25, h = Shield_thickness, center =true, $fn = 6);
-  translate([5/4, 0, 0])
-    hexa_grid(hexagon_radius = 5, hexagon_distance = 0, area_width = 50, area_length = 50, area_height = Shield_thickness);
-}
-    color(Couleur1){
-     // translate ([-.5 - Width/2,0, -Height/2])
-        rotate([0, 0, 0]){
-/*                      <- Adding text from here ->          
-        LText(1, -60, 30, "Arial Black", 4, "Digital Screen");//(On/Off, Xpos, Ypos, "Font", Size, "Text")
-        LText(1, 40, 30, "Arial Black", 4, "Level");
-        LText(1, -68 - 1, -33, "Arial Black", 6, "1");
-        LText(1, -48 - 1, -33, "Arial Black", 6, "2");
-        LText(1, -28 - 1, -33, "Arial Black", 6, "3");
-        CText(1, 0, -15, "Arial Black", 4, 10, 180, 0, "1 . 2 . 3 . 4 . 5 . 6");//(On/Off, Xpos, Ypos, "Font", Size, Diameter, Arc(Deg), Starting Angle(Deg),"Text")
-//                            <- To here ->
-*/            }
-      }
-}
+    hexagonal_grid([FanDia, FanDia, Shield_thickness], rear_hexagon_diameter, rear_hexagon_thickness);
+  } //in
+echo("---> END REAR PANEL"); 
+} //co  
+} //mo
 
 
 
