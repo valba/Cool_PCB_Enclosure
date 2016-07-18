@@ -34,7 +34,7 @@ Panel_Type = 0;// [0:Rear, 1:Front]
 
 /* [VISIBILITY] */
 // - InternalBox Visibility
-InternalBox_Visible = 0;// [0:No, 1:Yes]
+InternalBox_Visible = 1;// [0:No, 1:Yes]
 // - CounterShield Visibility
 CounterShield_Visible = 0;// [0:No, 1:Yes]
 // - Panel Visibility
@@ -113,9 +113,9 @@ Pillar3_item = 1;// [0:No, 1:Yes]
 // - Pillar1
 Pillar4_item = 1;// [0:No, 1:Yes]
 // - Pillar1
-Pillar5_item = 1;// [0:No, 1:Yes]
+Pillar5_item = 0;// [0:No, 1:Yes]
 // - Pillar1
-Pillar6_item = 1;// [0:No, 1:Yes]
+Pillar6_item = 0;// [0:No, 1:Yes]
 
   
 /* [TOP_SHIELD_ITEMS] */
@@ -492,7 +492,7 @@ echo("START RAILS ...");
       //external rail
       difference() {
         external_box1 = [Box_Length, Box_Width, Box_Height];
-        internal_box1 = [Box_Length - 2*honeycomb_hexagon_thickness, Box_Width, Box_Height];
+        internal_box1 = [Box_Length - 2*honeycomb_hexagon_thickness, Box_Width + 0.001, Box_Height + 0.001];
 
         rounded_polig4(external_box1, radius = Fillet);
         rounded_polig4(internal_box1, radius = Fillet);
@@ -500,12 +500,13 @@ echo("START RAILS ...");
 
       //internal rail
       difference(){        
-        external_box2 = [Box_Length - 2*honeycomb_hexagon_thickness - 2*Shield_thickness + 0.001, Box_Width - 2*Shield_thickness + 0.001, Box_Height - 2*Shield_thickness + 0.001];
-        internal_box2 = [Box_Length - 4*honeycomb_hexagon_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness];
+        external_box2 = [Box_Length - 2*honeycomb_hexagon_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness];
+        internal_box2 = [Box_Length - 4*honeycomb_hexagon_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness + 0.001, Box_Height - 2*Shield_thickness + 0.001];
 
         rounded_polig4(external_box2, radius = Fillet);
         rounded_polig4(internal_box2, radius = Fillet);
-      } //di (internal rail)              
+      } //di (internal rail)     
+      
     } //un
     internal_box3 = [Box_Length + 1, Box_Width - 2*Shield_thickness - 2*honeycomb_height, Box_Height - 2*Shield_thickness - 2*honeycomb_height];
     rounded_polig4(internal_box3, radius = Fillet);
@@ -517,12 +518,13 @@ echo("--> END RAILS");
 module shield(){
     
   union(){
+    external_box1 = [Box_Length, Box_Width, Box_Height];
+    internal_box1 = [Box_Length + 1, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness];
     difference(){
-      external_box1 = [Box_Length, Box_Width, Box_Height];
-      internal_box1 = [Box_Length + 1, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness];
-        
       rounded_polig4(external_box1, radius = Fillet);
       rounded_polig4(internal_box1, radius = Fillet);
+      ventilation_holes();
+      antipegs();
     } //di  
     panel_rails();
   } //un  
@@ -534,7 +536,7 @@ module shield(){
   internal_XPos = Box_Width - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness;
   internal_YPos = Box_Height - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness;
   internal_Pos = square_vertices(internal_XPos, internal_YPos);
-  
+  /*
   difference(){  
      
     for (i = [0 : 3] ){
@@ -549,6 +551,7 @@ module shield(){
           cylinder(r = Fillet + honeycomb_height/2, h = Box_Length + 1, center = true, $fn = 8);
     } //fo
   } //di
+  */
 } //mo
 
 
@@ -830,6 +833,66 @@ module pcb_feet(Shield_Type, bottom_active, top_active){
        // Fan_grille(!top_active); 
   }
         echo("--> END PCB FEET"); 
+  }
+} //mo
+
+
+//ANTI-PCB FEET
+module antipcb_feet(Shield_Type, bottom_active, top_active){    
+  echo("START PCB FEET ..."); 
+  //APCB FEET
+  if (Shield_Type == 0){
+    //Bottom        
+  if (SMPS_item == 1) {
+    translate([SMPS_PosX, SMPS_PosY, - Box_Height/2]) 
+      APCB(SMPS_Length, SMPS_Width, SMPS_Height, num = 0, active = bottom_active); }
+    
+  if (BPCB1_item == 1) {
+    translate([PCB1_PosX, PCB1_PosY, - Box_Height/2]) 
+      APCB(PCB1_Length, PCB1_Width, PCB1_Height, num = 1, active = bottom_active); }
+    
+  if (BPCB2_item == 1) {
+    translate([PCB2_PosX, PCB2_PosY, - Box_Height/2]) 
+      APCB(PCB2_Length, PCB2_Width, PCB2_Height, num = 2, active = bottom_active); }
+
+  if (BPCB3_item == 1) {
+    translate([PCB3_PosX, PCB3_PosY, - Box_Height/2]) 
+      APCB(PCB3_Length, PCB3_Width, PCB3_Height, num = 3, active = bottom_active); }
+
+  if (BPCB4_item == 1) {
+    translate([PCB4_PosX, PCB4_PosY, - Box_Height/2]) 
+      APCB(PCB4_Length, PCB4_Width, PCB4_Height, num = 4, active = bottom_active); }
+
+  if (BFan_Grill_item == 1) {
+    rotate([0,0,0])
+    translate([FanPosX, FanPosY, - Box_Height/2])
+      Fan_grille(fan_active = bottom_active); 
+//    if ((BFan_Grill_item == 1) && (visible == 1))
+//      %Fan_grille(!bottom_active); 
+  }
+  }
+  else {
+    //Top
+    if (TPCB1_item == 1) {
+      translate([PCB1_PosX, PCB1_PosY, - Box_Height/2]) 
+        APCB(PCB1_Length, PCB1_Width, PCB1_Height, num = 1, active = top_active); }
+    
+    if (TPCB2_item == 1) {
+      translate([PCB2_PosX, PCB2_PosY, - Box_Height/2]) 
+        APCB(PCB2_Length, PCB2_Width, PCB2_Height, num = 2, active = top_active); }
+
+    if (TPCB3_item == 1) {
+      translate([PCB3_PosX, PCB3_PosY, - Box_Height/2]) 
+        APCB(PCB3_Length, PCB3_Width, PCB3_Height, num = 3, active = top_active); }
+
+    if (TFan_Grill_item == 1) {
+      rotate([0,0,0])
+      translate([FanPosX, FanPosY, - Box_Height/2])
+        Fan_grille(fan_active = top_active); 
+     // if ((TFan_Grill_item == 1) && (top_visible == 1))
+       // Fan_grille(!top_active); 
+  }
+        echo("--> END APCB FEET"); 
   }
 } //mo
 
@@ -1170,7 +1233,6 @@ module tshield(top_active, top_visible) {
   echo("START TOP SHIELD ...");
   bottom_active = 0;
   difference() { //shield holes  
-    difference() { //sides decoration
       union() {    
         // Outer Shield
         difference() {
@@ -1185,6 +1247,7 @@ module tshield(top_active, top_visible) {
             cube ([Box_Width, Box_Length, Box_Height], center = true);
           echo("--> END HALF"); 
           antireeds();
+          antipcb_feet(Shield_Type = 0, bottom_active = 1, top_active = 0);
           //Fan Hole
           if (TFan_Grill_item == 1) {
             translate([FanPosX,  FanPosY, - Box_Height/2])
@@ -1194,9 +1257,6 @@ module tshield(top_active, top_visible) {
         reeds();
         pegs();
       } //un 
-      antipegs();
-      ventilation_holes();
-    } //di (side decorations)
     pillar_holes(Shield_Type = 1);
     } //di (shield holes)
     pillars(Shield_Type = 1);
@@ -1205,12 +1265,10 @@ module tshield(top_active, top_visible) {
 } //mo
 
 
-
 module bshield(bottom_active, bottom_visible) { 
   echo("START BOTTOM SHIELD ...");
   top_active = 0;
   difference() { //shield holes  
-    difference() { //sides decoration
       union() {    
         // Outer Shield
         difference() {
@@ -1225,6 +1283,7 @@ module bshield(bottom_active, bottom_visible) {
             cube ([Box_Width, Box_Length, Box_Height], center = true);
           echo("--> END HALF"); 
           antireeds();
+          antipcb_feet(Shield_Type = 0, bottom_active = 1, top_active = 0);
         //Fan Hole
           if (BFan_Grill_item == 1) {
             translate([FanPosX,  FanPosY, - Box_Height/2])
@@ -1234,9 +1293,6 @@ module bshield(bottom_active, bottom_visible) {
         reeds();
         pegs();
       } //un 
-      antipegs();
-      ventilation_holes();
-    } //di (side decorations)
     pillar_holes(Shield_Type = 0);
     } //di (shield holes)
     pillars(Shield_Type = 0);
@@ -1245,8 +1301,8 @@ module bshield(bottom_active, bottom_visible) {
 } //mo
 
 
-
-//FAN FOOT  
+// * FAN GRILLE
+// - FAN FOOT  
 module fanfoot(FanFootDia, FanFootHole, FanFootHeight){
   Fillet = Shield_thickness;
   color("Orange")   
@@ -1268,7 +1324,7 @@ module fanfoot(FanFootDia, FanFootHole, FanFootHeight){
 }
 
 
-//FAN GRILLE
+// - FAN GRILLE
 module Fan_grille(fan_active) {
     
   echo("START FAN GRILLE ...");
@@ -1334,6 +1390,8 @@ module Fan_grille(fan_active) {
   echo("--> END FAN GRILLE");
 }
 
+// * END OF FAN GRILLE
+
 
 //PCB FOOT  
 module PCBfoot(PCBFootDia, PCBFootHole, PCBFootHeight, active) {
@@ -1353,8 +1411,18 @@ module PCBfoot(PCBFootDia, PCBFootHole, PCBFootHeight, active) {
             }
           }
         }
-        cylinder(d = PCBFootHole, h = PCBFootHeight + 1, $fn=Resolution);
+        cylinder(d = PCBFootHole, h = PCBFootHeight + 0.001, $fn=Resolution);
       }          
+  }
+}
+
+//PCB ANTI-PCBFOOT  
+module APCBfoot(PCBFootDia, PCBFootHole, PCBFootHeight, active) {
+  if (active == 1) {  
+    color("Orange")   
+    translate([0 ,0 , Shield_thickness])
+        cylinder(d = PCBFootHole, h = PCBFootHeight + 0.001, $fn=Resolution);
+                
   }
 }
 
@@ -1391,8 +1459,16 @@ module PCB(PCBL, PCBW, PCBH, num, active){
 }
  
 
+// ANTI-PCB 
+module APCB(PCBL, PCBW, PCBH, num, active){     
+    // 4 PCB Feet
+    translate ([ - PCBL/2, - PCBW/2, 0]) APCBfoot(PCBFootDia, PCBFootHole, PCBFootHeight, active);
+    translate ([ - PCBL/2, PCBW/2, 0]) APCBfoot(PCBFootDia, PCBFootHole, PCBFootHeight, active);
+    translate ([ PCBL/2, - PCBW/2, 0]) APCBfoot(PCBFootDia, PCBFootHole, PCBFootHeight, active);
+    translate ([ PCBL/2, PCBW/2, 0]) APCBfoot(PCBFootDia, PCBFootHole, PCBFootHeight, active);
+}
 
-
+// * ROUNDED POLIGON
 
 module rounded_polig4(box, radius)
 {
@@ -1484,6 +1560,8 @@ function incenter(A, B, C) = (A * distance(B, C) + B * distance(C, A) + C * dist
 
 function roundvertex(A, B, C, r) = B + (unitv(incenter(A, B, C) - B) * r / sin(anglev(B - A, B - C)/2)); 
 
+// * END OF ROUNDED POLIGON
+
 
 // * HONEYCOMB
 
@@ -1497,13 +1575,13 @@ module hexagonal_grid(box, hexagon_diameter, hexagon_thickness){
 
     difference(){
         cube(box, center = true);
-        hexgrid(box, hexagon_diameter, hexagon_thickness + 0.001);
+        hexgrid(box, hexagon_diameter, hexagon_thickness);
     }
 }
 
 
 module hex_hole(hexdiameter, height){
-        translate([0, 0, 0]) rotate([0, 0, 0]) cylinder(d = hexdiameter, h = height + 0.001, center = true, $fn = 6);
+        translate([0, 0, 0]) rotate([0, 0, 0]) cylinder(d = hexdiameter, h = height, center = true, $fn = 6);
 }
 
 
@@ -1528,12 +1606,13 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
 
     for(x = [-x0: 2*a*sin60 : x0]) {
         for(y = [-y0 : a : y0]) {
-            translate([x, y, 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2]);
-           translate([x + a*sin60, y + a*cos60 , 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2]);
+            translate([x, y, 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2] + 0.001);
+           translate([x + a*sin60, y + a*cos60 , 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2] + 0.001);
         }
     }
 }
 
+// * END OF HONEYCOMB
 
 
 // * PANELS
@@ -1630,14 +1709,14 @@ color(Couleur2){
     rotate([90, 0, 0])
       rounded_polig4([panel_thickness, panel_length, panel_height], Fillet);
     translate([50, 0, 0])    
-      rounded_polig6(hexagon_vertices(r = 25), Shield_thickness + 1, 5);
+      rounded_polig6(hexagon_vertices(r = 25), Shield_thickness + 0.001, 5);
     translate([-50, -20, 0])    
       rounded_polig6(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10, 2);
   } //di
 
   translate([50, 0, 0])    
   intersection(){
-    rounded_polig6(hexagon_vertices(r = 25), Shield_thickness + 1, 5);
+    rounded_polig6(hexagon_vertices(r = 25), Shield_thickness + 0.001, 5);
     hexagonal_grid([FanDia, FanDia, Shield_thickness], rear_hexagon_diameter, rear_hexagon_thickness);
   } //in
 echo("---> END REAR PANEL"); 
