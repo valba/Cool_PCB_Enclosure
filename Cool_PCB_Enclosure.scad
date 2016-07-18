@@ -25,7 +25,7 @@
 // - Coque
 Shield_Part = 1;// [0:No, 1:Yes]
 // - Coque Type
-Shield_Type = 1;// [0:Bottom, 1:Top]
+Shield_Type = 0;// [0:Bottom, 1:Top]
 // - Panel
 Panel_Part = 0;// [0:No, 1:Yes]
 // - Coque Type
@@ -491,17 +491,24 @@ echo("START RAILS ...");
     union(){
       //external rail
       difference() {
-        rounded_cube(length = Box_Length, width = Box_Width, height = Box_Height, radius =Fillet);
-        rounded_cube(length = Box_Length - 2*honeycomb_hexagon_thickness, width = Box_Width, height = Box_Height, radius = Fillet);
+        external_box1 = [Box_Length, Box_Width, Box_Height];
+        internal_box1 = [Box_Length - 2*honeycomb_hexagon_thickness, Box_Width, Box_Height];
+
+        rounded_polig4(external_box1, radius = Fillet);
+        rounded_polig4(internal_box1, radius = Fillet);
       } //di (external rail)
 
       //internal rail
       difference(){        
-        rounded_cube(length = Box_Length - 2*honeycomb_hexagon_thickness - 2*Shield_thickness + 0.001, width = Box_Width - 2*Shield_thickness + 0.001, height = Box_Height - 2*Shield_thickness + 0.001, radius = Fillet);
-        rounded_cube(length = Box_Length - 4*honeycomb_hexagon_thickness - 2*Shield_thickness, width = Box_Width - 2*Shield_thickness, height = Box_Height - 2*Shield_thickness, radius = Fillet);
+        external_box2 = [Box_Length - 2*honeycomb_hexagon_thickness - 2*Shield_thickness + 0.001, Box_Width - 2*Shield_thickness + 0.001, Box_Height - 2*Shield_thickness + 0.001];
+        internal_box2 = [Box_Length - 4*honeycomb_hexagon_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness];
+
+        rounded_polig4(external_box2, radius = Fillet);
+        rounded_polig4(internal_box2, radius = Fillet);
       } //di (internal rail)              
     } //un
-    rounded_cube(length = Box_Length + 1, width = Box_Width - 2*Shield_thickness - 2*honeycomb_height, height = Box_Height - 2*Shield_thickness - 2*honeycomb_height, radius = Fillet);
+    internal_box3 = [Box_Length + 1, Box_Width - 2*Shield_thickness - 2*honeycomb_height, Box_Height - 2*Shield_thickness - 2*honeycomb_height];
+    rounded_polig4(internal_box3, radius = Fillet);
   } //di        
 echo("--> END RAILS");
 } //mo
@@ -511,9 +518,11 @@ module shield(){
     
   union(){
     difference(){
-      rounded_cube(length = Box_Length, width = Box_Width, height = Box_Height, radius = Fillet);
-      
-     rounded_cube(length = Box_Length + 1, width = Box_Width - 2*Shield_thickness, height = Box_Height - 2*Shield_thickness, radius = Fillet);
+      external_box1 = [Box_Length, Box_Width, Box_Height];
+      internal_box1 = [Box_Length + 1, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness];
+        
+      rounded_polig4(external_box1, radius = Fillet);
+      rounded_polig4(internal_box1, radius = Fillet);
     } //di  
     panel_rails();
   } //un  
@@ -525,8 +534,6 @@ module shield(){
   internal_XPos = Box_Width - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness;
   internal_YPos = Box_Height - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness;
   internal_Pos = square_vertices(internal_XPos, internal_YPos);
-echo(external_Pos);
-  echo(internal_Pos);
   
   difference(){  
      
@@ -861,7 +868,7 @@ module Panelrs(){//Panels
                      
                   translate([-Shield_thickness,Box_Width*3/4,Box_Height/2])
                      //cube([27.5,27.5,20], center = true);
-                      rotate([90, 0, 90]) rounded_trapezoid(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10, 2);
+                      rotate([90, 0, 90]) rounded_polig6(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10, 2);
                   //translate([Thick- 27.5,Width/2,Height/2])
                     // RoundBox(27.5, 27.5, 20);
                   translate([Shield_thickness,Box_Width/4,Box_Height/2])
@@ -877,7 +884,7 @@ module Panelrs(){//Panels
         translate([0+m,m/2,m/2])
                   translate([-Shield_thickness*4,Box_Width*3/4,Box_Height/2])
                      //cube([27.5,27.5,20], center = true);
-                  rotate([90, 0, 90]) %rounded_trapezoid(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10*2, 2);
+                  rotate([90, 0, 90]) %rounded_polig6(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10*2, 2);
         translate([0+m,m/2,m/2])
                   translate([-Shield_thickness*4,Box_Width*3/4,Box_Height/2])
                  color("Olive") rotate([90, 0, -90]) 
@@ -915,7 +922,7 @@ module SquareHole(OnOff, Sx, Sy, Sl, Sw, Fillet){
     if(OnOff==1)
         translate([Sx, Sy, 0])
         rotate([90, 0, 0])
-        rounded_cube(Shield_thickness + 1, Sl, Sw, Fillet);
+        rounded_polig4([Shield_thickness + 1, Sl, Sw], Fillet);
  /*    minkowski(){
         translate([Sx + Fillet/2, -1, Sz + Fillet/2])
             cube([Sl - Fillet, Sw - Fillet, 10], center = true);
@@ -989,8 +996,8 @@ module tshield(top_active, top_visible) {
                 echo("START RAILS ..."); 
              //long Rails
               difference(){        
-                rounded_cube(Box_Length - 2*honeycomb_hexagon_thickness - 2*Shield_thickness + 0.001, Box_Width - 2*Shield_thickness + 0.001, Box_Height - 2*Shield_thickness + 0.001, Fillet);
-                rounded_cube(Box_Length - 4*honeycomb_hexagon_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness, Fillet);
+                rounded_polig4(Box_Length - 2*honeycomb_hexagon_thickness - 2*Shield_thickness + 0.001, Box_Width - 2*Shield_thickness + 0.001, Box_Height - 2*Shield_thickness + 0.001, Fillet);
+                rounded_polig4(Box_Length - 4*honeycomb_hexagon_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness, Fillet);
               }
               echo("--> END RAILS"); 
             }
@@ -1006,7 +1013,7 @@ module tshield(top_active, top_visible) {
             }
           }
           // Rail height
-          rounded_cube(Box_Length + Shield_thickness, Box_Width - 6*honeycomb_hexagon_thickness, Box_Height - 6*honeycomb_hexagon_thickness, Fillet);
+          rounded_polig4(Box_Length + Shield_thickness, Box_Width - 6*honeycomb_hexagon_thickness, Box_Height - 6*honeycomb_hexagon_thickness, Fillet);
         }
         echo("START REEDS ..."); 
         // Reeds
@@ -1387,9 +1394,14 @@ module PCB(PCBL, PCBW, PCBH, num, active){
 
 
 
-module rounded_cube(length, width, height, radius)
+module rounded_polig4(box, radius)
 {
+  rotate([-0, 0, 0]){
+    length = box[0];
+    width = box[1];
+    height = box[2];
 	vertices = square_vertices(height, width);
+    
     A = vertices[0];
 	B = vertices[1];
 	C = vertices[2];
@@ -1403,20 +1415,21 @@ module rounded_cube(length, width, height, radius)
 		translate(roundvertex(B, C, D, radius)) circle(r = radius, center = true);
 		translate(roundvertex(C, D, A, radius)) circle(r = radius, center = true);
 		translate(roundvertex(D, A, B, radius)) circle(r = radius, center = true);
-	}
+	} //hu
+  }  //ro
 }
 
 
-// vertex - [t,x,y,z]
+// polig6 - [x,y,z]
 // radius - radius of corners
-module rounded_trapezoid(vertex, height, radius)
+module rounded_polig6(polig6, height, radius)
 {
-	A = vertex[0];
-	B = vertex[1];
-	C = vertex[2];
-	D = vertex[3];
-	E = vertex[4];
-	F = vertex[5];
+	A = polig6[0];
+	B = polig6[1];
+	C = polig6[2];
+	D = polig6[3];
+	E = polig6[4];
+	F = polig6[5];
 
 	linear_extrude(height = height, center= true, $fn = 64)
 	hull()
@@ -1434,23 +1447,14 @@ module rounded_trapezoid(vertex, height, radius)
 
 
 function square_vertices(x, y) = [[-x/2, -y/2, 0], [-x/2, y/2, 0], [x/2, y/2, 0], [x/2, -y/2, 0]];
+
 function trapezoid_vertex(long_base, height, short_base, base_height) = [[-long_base/2, -height/2, 0], [-long_base/2, - height/2 + base_height, 0], [-short_base/2, height/2, 0], [short_base/2, height/2, 0], [long_base/2, - height/2 + base_height, 0], [long_base/2, -height/2, 0]];
+
 function hexagon_vertices(r) = [[r * cos(2 * 180 * 0 / 6), r * sin(2 * 180 * 0/6), 0], [r * cos(2 * 180 * 1/6), r * sin(2 * 180 * 1/6), 0], [r * cos(2 * 180 * 2/6), r * sin(2 * 180 * 2/6), 0], [r * cos(2 * 180 * 3/6), r * sin(2 * 180 * 3/6), 0], [r * cos(2 * 180 * 4/6), r * sin(2 * 180 * 4/6), 0], [r * cos(2 * 180 * 5/6), r * sin(2 * 180 * 5/6), 0]];
 
-//translate([-30, -30, 0]) rotate([90, 0, 90]) rounded_trapezoid(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10, 2);
-//translate([-30, -30, 0]) rotate([90, 0, 90]) rounded_trapezoid(hexagon_vertices(20), 10, 5);
+//translate([-30, -30, 0]) rotate([90, 0, 90]) rounded_polig6(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10, 2);
+//translate([-30, -30, 0]) rotate([90, 0, 90]) rounded_polig6(hexagon_vertices(20), 10, 5);
 
-
-
-
-//---------------------------------------------------------------
-//-- Openscad vector library
-//-- This is a component of the obiscad opescad tools by Obijuan
-//-- (C) Juan Gonzalez-Gomez (Obijuan)
-//-- Sep-2012
-//---------------------------------------------------------------
-//-- Released under the GPL license
-//---------------------------------------------------------------
 
 //----------------------------------------
 //-- FUNCTIONS FOR WORKING WITH VECTORS
@@ -1578,7 +1582,7 @@ module FPanel(){
         //Panel(Length,Width,Thick,Fillet);
         //translate([0, 0, -panel_height/2]) 
         rotate([90, 0, 0])
-        rounded_cube(panel_thickness, panel_length, panel_height, Fillet);
+        rounded_polig4([panel_thickness, panel_length, panel_height], Fillet);
     
 //    translate([0, 0, 0 ])
     rotate([0,0,0]){
@@ -1624,16 +1628,16 @@ color(Couleur2){
   panel_thickness = Shield_thickness - m;
   difference(){
     rotate([90, 0, 0])
-      rounded_cube(panel_thickness, panel_length, panel_height, Fillet);
+      rounded_polig4([panel_thickness, panel_length, panel_height], Fillet);
     translate([50, 0, 0])    
-      rounded_trapezoid(hexagon_vertices(r = 25), Shield_thickness + 1, 5);
+      rounded_polig6(hexagon_vertices(r = 25), Shield_thickness + 1, 5);
     translate([-50, -20, 0])    
-      rounded_trapezoid(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10, 2);
+      rounded_polig6(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10, 2);
   } //di
 
   translate([50, 0, 0])    
   intersection(){
-    rounded_trapezoid(hexagon_vertices(r = 25), Shield_thickness + 1, 5);
+    rounded_polig6(hexagon_vertices(r = 25), Shield_thickness + 1, 5);
     hexagonal_grid([FanDia, FanDia, Shield_thickness], rear_hexagon_diameter, rear_hexagon_thickness);
   } //in
 echo("---> END REAR PANEL"); 
@@ -1698,7 +1702,7 @@ module Tpillar(pillar_height, ext_diameter, int_diameter, base_hole_diameter, ba
 //        SquareHole  (1, -68, -20, 15, 10, 1); //(On/Off, Xpos, Ypos, Length, Width, Fillet)
 //union(){ 
     //rotate([90, 0, 0])
-//color("red")        rounded_cube(panel_thickness, panel_length, panel_height, Fillet);
+//color("red")        rounded_polig4(panel_thickness, panel_length, panel_height, Fillet);
     
 //    translate([0, 0, 0 ])
 //                     <- Cutting shapes from here ->  
