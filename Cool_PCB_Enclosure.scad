@@ -20,14 +20,13 @@
 //-- CUSTOMIZER PARAMETERS
 //---------------------------------------------------------------
 
-
 /* [ACTIVE_PARTS] */
 // - Coque
 Shield_Part = 1;// [0:No, 1:Yes]
 // - Coque Type
 Shield_Type = 0;// [0:Bottom, 1:Top]
 // - Panel
-Panel_Part = 1;// [0:No, 1:Yes]
+Panel_Part = 0;// [0:No, 1:Yes]
 // - Coque Type
 Panel_Type = 0;// [0:Rear, 1:Front]
 
@@ -578,10 +577,10 @@ echo("START HEX MESH ...");
 
     h_area = [Box_Width - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
   translate([0, 0, -Box_Height/2 + Shield_thickness + hh/2]) 
-    hexagonal_grid(box = h_area, hexagon_diameter = 2/sqrt(3)*rhd - hht, hexagon_thickness = hht);
+    hexagonal_grid(box = h_area, hexagon_diameter = (rhd - hht)/sin(60), hexagon_thickness = hht);
 
     v_area1 = [Box_Height - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
-    echo(v_area1);
+//    echo(v_area1);
   translate([-Box_Width/2 + Shield_thickness + hh/2, 0, 0]) rotate([0, 90, 0]) 
     hexagonal_grid(box = v_area1, hexagon_diameter = 2/sqrt(3)*rhd - hht, hexagon_thickness = hht);
 
@@ -1613,7 +1612,9 @@ module hex_hole(hexdiameter, height){
 
 
 module hexgrid(box, hexagon_diameter, hexagon_thickness) {
-    a = (hexagon_diameter + hexagon_thickness)*sin(60);
+    d = hexagon_diameter + hexagon_thickness;
+    a = d*sin(60);
+    
     cos60 = cos(60);
     sin60 = sin(60);
     
@@ -1626,9 +1627,15 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
     numY = (box[1] - moduloY) / hexagon_diameter;
     oddY = numY % 2;
     numberY = numY + oddY;
+    echo("************");
+    echo("TO DO: DISCERNING WHEN deltaX is 0 or a/2");
+    echo("************");
+    
+// NOT ALWAYS CORRECT:
+    deltaX = oddX == 1 ? a/2 : 0;
 
-    x0 = (numberX + 2) * (hexagon_diameter + hexagon_thickness)/2;
-    y0 = (numberY + 2) * (hexagon_diameter + hexagon_thickness)*sqrt(3)/2/2;
+    x0 = (numberX + 2) * d/2;
+    y0 = (numberY + 2) * a/2 + deltaX;
 
 
     for(x = [-x0: 2*a*sin60 : x0]) {
