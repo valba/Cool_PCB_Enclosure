@@ -27,14 +27,14 @@ Shield_Part = 1;// [0:No, 1:Yes]
 // - Coque Type
 Shield_Type = 0;// [0:Bottom, 1:Top]
 // - Panel
-Panel_Part = 0;// [0:No, 1:Yes]
+Panel_Part = 1;// [0:No, 1:Yes]
 // - Coque Type
 Panel_Type = 0;// [0:Rear, 1:Front]
 
 
 /* [VISIBILITY] */
 // - InternalBox Visibility
-InternalBox_Visible = 1;// [0:No, 1:Yes]
+InternalBox_Visible = 0;// [0:No, 1:Yes]
 // - CounterShield Visibility
 CounterShield_Visible = 0;// [0:No, 1:Yes]
 // - Panel Visibility
@@ -43,11 +43,11 @@ Panel_Visible = 1;// [0:No, 1:Yes]
 
 /* [EXTERNAL_BOX_DIMENSIONS] */
 // - Longueur - Length  
-Box_Length = 260;       
+Box_Length = 360;       
 // - Largeur - Width
-Box_Width = 210;                     
+Box_Width = 180;                     
 // - Hauteur - Height  
-Box_Height = 105;  
+Box_Height = 120;  
 
 
 /* [INTERNAL_BOX_DIMENSIONS] */
@@ -97,24 +97,24 @@ BFan_Grill_item = 0;// [0:No, 1:Yes]
 // - Bottom PCB1
 BPCB1_item = 0;// [0:No, 1:Yes]
 // - Bottom PCB2
-BPCB2_item = 1;// [0:No, 1:Yes]
+BPCB2_item = 0;// [0:No, 1:Yes]
 // - Bottom PCB3
-BPCB3_item = 1;// [0:No, 1:Yes]
+BPCB3_item = 0;// [0:No, 1:Yes]
 // - Bottom PCB4
 BPCB4_item = 0;// [0:No, 1:Yes]
 // - Power Supply
 SMPS_item = 1;// [0:No, 1:Yes]
-// - Pillar1
+// - Pillar #1
 Pillar1_item = 1;// [0:No, 1:Yes]
-// - Pillar1
+// - Pillar #2
 Pillar2_item = 1;// [0:No, 1:Yes]
-// - Pillar1
+// - Pillar #3
 Pillar3_item = 1;// [0:No, 1:Yes]
-// - Pillar1
+// - Pillar #4
 Pillar4_item = 1;// [0:No, 1:Yes]
-// - Pillar1
+// - Pillar #5
 Pillar5_item = 0;// [0:No, 1:Yes]
-// - Pillar1
+// - Pillar #6
 Pillar6_item = 0;// [0:No, 1:Yes]
 
   
@@ -131,6 +131,13 @@ TPCB3_item = 0;// [0:No, 1:Yes]
 TPCB4_item = 0;// [0:No, 1:Yes]
 
 
+
+/* [REAR_PANEL_ITEMS] */
+// - Rear Fan Grill
+RFan_Grill_item = 1;// [0:No, 1:Yes]
+
+
+
 /* [COMMON_FEET_PARAMETERS) ] */
 //All dimensions are from the center foot axis
 
@@ -143,14 +150,26 @@ PCBFootHole        = 3;
 
 
 /* [SMPS_FEET_PARAMETERS) ] */
+/*
 // - Center X position
-SMPS_PosX         = -55 + 20;
+SMPS_PosX         = 0;
 // - Center Y Position
 SMPS_PosY         = 0;
 // - Longueur PCB - PCB Length
 SMPS_Length       = 49.38;
 // - Largeur PCB - PCB Width
 SMPS_Width        = 203.2;
+// - Heuteur PCB - PCB height
+SMPS_Height      = 50.8;
+*/
+// - Center X position
+SMPS_PosX         = 0;
+// - Center Y Position
+SMPS_PosY         = 0;
+// - Longueur SMPS - SMPS Length
+SMPS_Length       = 114.3;
+// - Largeur PCB - PCB Width
+SMPS_Width        = 215.9;
 // - Heuteur PCB - PCB height
 SMPS_Height      = 50.8;
 
@@ -208,19 +227,19 @@ PCB4_Height      = 25;
 
 /* [PILLAR_PARAMETERS) ] */
 // - Center X Position
-BPillar1_PosX         = -87;
+BPillar1_PosX         = -75;
 // - Center Y Position
 BPillar1_PosY        = 80;
 // - Center X Position
-BPillar2_PosX         = -87;
+BPillar2_PosX         = -75;
 // - Center Y Position
 BPillar2_PosY        = -80;
 // - Center X Position
-BPillar3_PosX         = 87;
+BPillar3_PosX         = 75;
 // - Center Y Position
 BPillar3_PosY        = 80;
 // - Center X Position
-BPillar4_PosX         = 87;
+BPillar4_PosX         = 75;
 // - Center Y Position
 BPillar4_PosY        = -80;
 // - Center X Position
@@ -263,7 +282,7 @@ TPillar6_PosY        = BPillar6_PosY;
 /* [FAN_GRILL_PARAMETERS) ] */
 //All dimensions are from the center foot axis
 // - Center X position
-FanPosX         = -45;
+FanPosX         = 10;
 // - Center Y position
 FanPosY         = 0;
 // - Longueur Fan - Fan Length
@@ -279,17 +298,13 @@ FanFootDia         = 8;
 // - Diamètre trou - Hole diameter
 FanFootHole        = 3;  
 // - Diamètre Fan - Fan diameter
-FanDia        = 72;  
+FanDia        = 80;  
 
 
-// - Distance from the Outside Circle to the Corners
-cornerRadius = 15;	// 
-// - How large would you like the inner icon or Text to be as a Ratio to the Fan Size?
+// - Size of the inner icon or text
 innerIconDiameter = 45;	// [0:50]
-// - 
-inner_circle_diameter = innerIconDiameter/150 * FanDia;
-// - How Thick do you require the outer frame to be?
-outsideFrameThickness = FanFootHeight;	
+// - Diameter of the circle
+inner_circle_diameter =30;
 // - Thickness of the Inner Vanes which should be less than outside frame thickness
 innerThickness = (FanFootHeight+Shield_thickness)*3/4;	
 // - How much thicker or thinner would you like the inner Logo to Be than the Innver Vane Thickness?
@@ -317,9 +332,9 @@ ring_spacing = (FanDia - inner_circle_diameter + ringWidth) / (numberOfRings + 1
 
 /*[HEXAGONAL GRID]*/
 // - 
-area_width = 50;
+area_width = 80;
 // - 
-area_length = 50;
+area_length = 80;
 // - 
 hexagon_radius = 5;  
 // - 
@@ -806,7 +821,7 @@ module pcb_feet(Shield_Type, bottom_active, top_active){
   if (BFan_Grill_item == 1) {
     rotate([0,0,0])
     translate([FanPosX, FanPosY, - Box_Height/2])
-      Fan_grille(fan_active = bottom_active); 
+      Fan_grille(fan_active = bottom_active, plate_thickness = Shield_thickness); 
 //    if ((BFan_Grill_item == 1) && (visible == 1))
 //      %Fan_grille(!bottom_active); 
   }
@@ -827,8 +842,8 @@ module pcb_feet(Shield_Type, bottom_active, top_active){
 
     if (TFan_Grill_item == 1) {
       rotate([0,0,0])
-      translate([FanPosX, FanPosY, - Box_Height/2])
-        Fan_grille(fan_active = top_active); 
+      translate([FanPosX, FanPosY, - (Box_Height - Shield_thickness)/2])
+        Fan_grille(fan_active = top_active, plate_thickness = Shield_thickness); 
      // if ((TFan_Grill_item == 1) && (top_visible == 1))
        // Fan_grille(!top_active); 
   }
@@ -862,14 +877,15 @@ module antipcb_feet(Shield_Type, bottom_active, top_active){
   if (BPCB4_item == 1) {
     translate([PCB4_PosX, PCB4_PosY, - Box_Height/2]) 
       APCB(PCB4_Length, PCB4_Width, PCB4_Height, num = 4, active = bottom_active); }
-
+/*
   if (BFan_Grill_item == 1) {
     rotate([0,0,0])
     translate([FanPosX, FanPosY, - Box_Height/2])
-      Fan_grille(fan_active = bottom_active); 
+      Fan_grille(fan_active = bottom_active, plate_thickness = Shield_thickness); 
 //    if ((BFan_Grill_item == 1) && (visible == 1))
 //      %Fan_grille(!bottom_active); 
-  }
+    }
+*/
   }
   else {
     //Top
@@ -885,13 +901,14 @@ module antipcb_feet(Shield_Type, bottom_active, top_active){
       translate([PCB3_PosX, PCB3_PosY, - Box_Height/2]) 
         APCB(PCB3_Length, PCB3_Width, PCB3_Height, num = 3, active = top_active); }
 
-    if (TFan_Grill_item == 1) {
+ /*   if (TFan_Grill_item == 1) {
       rotate([0,0,0])
       translate([FanPosX, FanPosY, - Box_Height/2])
-        Fan_grille(fan_active = top_active); 
+        Fan_grille(fan_active = top_active, plate_thickness = Shield_thickness); 
      // if ((TFan_Grill_item == 1) && (top_visible == 1))
        // Fan_grille(!top_active); 
   }
+*/
         echo("--> END APCB FEET"); 
   }
 } //mo
@@ -1306,7 +1323,7 @@ module bshield(bottom_active, bottom_visible) {
 module fanfoot(FanFootDia, FanFootHole, FanFootHeight){
   Fillet = Shield_thickness;
   color("Orange")   
-    translate([0 ,0 , Shield_thickness])
+//    translate([0 ,0 , Shield_thickness])
       difference() {
         difference() {
           cylinder(d = FanFootDia + Fillet, h = FanFootHeight,  $fn=Resolution);
@@ -1325,11 +1342,15 @@ module fanfoot(FanFootDia, FanFootHole, FanFootHeight){
 
 
 // - FAN GRILLE
-module Fan_grille(fan_active) {
+module Fan_grille(fan_active, plate_thickness) {
+    echo(plate_thickness);
     
-  echo("START FAN GRILLE ...");
+echo("START FAN GRILLE ...");
+// - How Thick do you require the outer frame to be?
+outsideFrameThickness = FanFootHeight; // + plate_thickness;	
+
   // Fan only visible in the preview mode
-  if (InternalBox_Visible ==1) {
+  if (InternalBox_Visible == 1) {
   translate([0, 0, FanFootHeight + Shield_thickness+ FanH/2])   
     %cube ([FanL + 3/2*FanFootDia, FanW + 3/2*FanFootDia, FanH], center = true);
   translate([0, 0, FanFootHeight + Shield_thickness+ FanH])   
@@ -1338,55 +1359,61 @@ module Fan_grille(fan_active) {
   }
   
   // Fan Grille + 4 Fan Feet
+  translate([0, 0, plate_thickness/2])
   union() {
     // outer mounting ring is a cube minus the cutouts
-    translate([0, 0, Shield_thickness+ outsideFrameThickness/2])
+    translate([0, 0, outsideFrameThickness/2 ])
  	  difference() {
         intersection() {
           difference(){
-            cube([FanL + FanFootDia/2, FanW + FanFootDia/2, outsideFrameThickness], center = true);
+              union(){
+            cube([(FanL + sqrt(2)*FanFootDia), (FanW + sqrt(2)*FanFootDia), outsideFrameThickness], center = true);
+/*
+                  // cut the screw holes
             translate ([ - FanL/2, - FanW/2, 0]) cylinder(d = FanFootHole, FanFootHeight);
             translate ([ - FanL/2, FanW/2, 0]) cylinder(d = FanFootHole, FanFootHeight);
             translate ([ FanL/2, - FanW/2, 0]) cylinder(d = FanFootHole, FanFootHeight);
             translate ([ FanL/2, FanW/2, 0]) cylinder(d = FanFootHole, FanFootHeight);
-          }
-		  cylinder( r = FanDia/2 + cornerRadius, h = outsideFrameThickness, center = true);
-		}
+*/              }
+              } //di
+		  cylinder( d = sqrt(2)*FanL -FanFootDia, h = outsideFrameThickness, center = true, $fn = 12);
+		} //in
 		// cut the main center hole
-		cylinder(r = FanDia/2, h = outsideFrameThickness * 2, center = true);
-      }
+		cylinder(r = FanDia/2, h = outsideFrameThickness + 0.001, center = true);
+      }  //di
 
     // Fan Feet
-    if (fan_active == 1) {
+    if (fan_active == 1) 
+      translate([0, 0, -0* plate_thickness/2]) {
         echo("----------FAN FEET-----------");
-      translate ([ - FanL/2, - FanW/2, 0]) fanfoot(FanFootDia, FanFootHole, FanFootHeight);
+    translate ([ - FanL/2, - FanW/2, 0]) fanfoot(FanFootDia, FanFootHole, FanFootHeight);
     translate ([ - FanL/2, FanW/2, 0]) fanfoot(FanFootDia, FanFootHole, FanFootHeight);
     translate ([ FanL/2, - FanW/2, 0]) fanfoot(FanFootDia, FanFootHole, FanFootHeight);
     translate ([ FanL/2, FanW/2, 0]) fanfoot(FanFootDia, FanFootHole, FanFootHeight);
     }
     
   // Make Icon
+  translate([0, 0, - plate_thickness/2 + 0*outsideFrameThickness - 0* innerThickness]){
   rotate([0,0,-90 + rotateLogo])
     scale([inner_circle_diameter/20, inner_circle_diameter/20, 1])
       pickLogo(innerIconLogo, innerLogoThickness, 1, inner_circle_diameter);
 
-  translate([0, 0, 0*Shield_thickness- outsideFrameThickness + innerThickness]){
     // rotate for aesthetics
-    rotate([0,0,vane_angle/2])
+    rotate([0, 0, vane_angle/2])
       for (angle = [0 : vane_angle : 360]) {
         rotate([0,0,angle])
          translate(v = [0, -vaneWidth/2, 0])
             cube(size = [FanDia/2, vaneWidth, innerThickness]);
-      }
+      } //fo
       // circles
       for (x = [1 : numberOfRings ]) {
         difference() {
           cylinder(h = innerThickness, r = inner_circle_diameter/2 + (ring_spacing * x) + (ringWidth/2));
-          cylinder(h = innerThickness+1, r = inner_circle_diameter/2 + (ring_spacing * x) - (ringWidth/2));
-        }
-      }
-    }
-  }
+          cylinder(h = innerThickness + 0.001, r = inner_circle_diameter/2 + (ring_spacing * x) - (ringWidth/2));
+        } //di
+      } //fo
+    } //tr
+  } //un
   echo("--> END FAN GRILLE");
 }
 
@@ -1633,29 +1660,29 @@ module front_panel(active, visible) {
 }
 
 // - REAR PANEL
-module rear_panel(active, visible) {
+module rear_panel(active, RPanel_visible) {
   union() {
     if (active == 1)
       translate([0, + Box_Length/2 - honeycomb_hexagon_thickness - m/2, 0]) 
         rotate([-90, 180, 0])
         RPanel();
     else
-      if (visible == 1)
+      if (RPanel_visible == 1)
         translate([0, + Box_Length/2 - honeycomb_hexagon_thickness - m/2, 0]) 
         rotate([-90, 180, 0])
           %RPanel();
  
   }    
-  echo("*** END FRONT PANEL ***"); 
+  echo("*** END REAR PANEL ***"); 
 }
 
 
 // - FPANEL
 module FPanel(){
   echo("START FRONT PANEL ..."); 
-    panel_height = Box_Height -2*Shield_thickness - m;
-    panel_length = Box_Width - 2*Shield_thickness - m;
-    panel_thickness = Shield_thickness - m;
+    panel_height = Box_Height - 2*Shield_thickness * m;
+    panel_length = Box_Width - 2*Shield_thickness * m;
+    panel_thickness = Shield_thickness * m;
     difference(){
         color(Couleur2)
         //Panel(Length,Width,Thick,Fillet);
@@ -1701,27 +1728,73 @@ module FPanel(){
 // - RPANEL
 module RPanel(){
 echo("START REAR PANEL ..."); 
-color(Couleur2){    
-  panel_height = Box_Height -2*Shield_thickness - m;
-  panel_length = Box_Width - 2*Shield_thickness - m;
-  panel_thickness = Shield_thickness - m;
+  panel_height = Box_Height - 2*Shield_thickness;
+  panel_length = Box_Width - 2*Shield_thickness;
+  panel_thickness = Shield_thickness;
+    // Items' positions must be referenced from the outside of the enclosure.
+
+rotate([0, 180 , 0]) {
   difference(){
     rotate([90, 0, 0])
       rounded_polig4([panel_thickness, panel_length, panel_height], Fillet);
-    translate([50, 0, 0])    
-      rounded_polig6(hexagon_vertices(r = 25), Shield_thickness + 0.001, 5);
-    translate([-50, -20, 0])    
+    
+    // Fan hole
+    translate([FanPosX + 15, FanPosY, 0]) {
+    cylinder(d = FanDia, h = Shield_thickness + 0.001, center = true);
+//    rotate([0, 0, 30])    
+//      rounded_polig6(hexagon_vertices(r = 40), Shield_thickness + 0.001, 5);
+/*    translate([FanLength/2, FanWidth/2, 0])
+        cylinder(r = 4.3/2, h = panel_thickness + 0.001, center = true);
+    translate([FanLength/2, - FanWidth/2, 0])
+        cylinder(r = 4.3/2, h = panel_thickness + 0.001, center = true);
+    translate([- FanLength/2, FanWidth/2, 0])
+        cylinder(r = 4.3/2, h = panel_thickness + 0.001, center = true);
+    translate([- FanLength/2, - FanWidth/2, 0])
+        cylinder(r = 4.3/2, h = panel_thickness + 0.001, center = true);
+*/    }
+    
+    // Plug hole
+    translate([- 45, -30, 0]){     
       rounded_polig6(trapezoid_vertex(27.5, 19.4, 14, 12.4), 10, 2);
-  } //di
+    translate([- 20, 0, 0])     
+        cylinder(d = 3.4, h = panel_thickness + 0.001, center = true);
+    translate([20, 0, 0])     
+        cylinder(d = 3.4, h = panel_thickness + 0.001, center = true);
+    }
 
-  translate([50, 0, 0])    
+    // Switch hole
+    translate([- 45, 30, 0])
+      cube([30.2, 22, panel_thickness + 0.001], center = true);
+
+  // Fuse hole
+  translate([- 45, 0, 0])
+    intersection(){
+      cylinder(d = 16.13, h = panel_thickness + 0.001, center = true);
+      cube([16.13, 13.97, panel_thickness + 0.001], center = true);
+    } //in
+
+  } //di
+/*
+  translate([FanPosX + 15, FanPosY, 0])
+        rotate([0, 0, 30])    
   intersection(){
-    rounded_polig6(hexagon_vertices(r = 25), Shield_thickness + 0.001, 5);
+//    rounded_polig6(hexagon_vertices(r = 40), Shield_thickness + 0.001, 5);
+    cylinder(d = FanDia, h = Shield_thickness + 0.001, center = true);
     hexagonal_grid([FanDia, FanDia, Shield_thickness], rear_hexagon_diameter, rear_hexagon_thickness);
   } //in
+  */
+  if (RFan_Grill_item == 1){
+    translate([FanPosX + 15, FanPosY, -panel_thickness/2])
+      rotate([0, 0, 0])    
+        Fan_grille(fan_active = 1, plate_thickness = panel_thickness); 
+  }
+  } //ro
 echo("---> END REAR PANEL"); 
-} //co  
 } //mo
+
+//  panel_thickness = Shield_thickness;
+
+  //      Fan_grille(fan_active = 1, plate_thickness = panel_thickness); 
 
 
 
