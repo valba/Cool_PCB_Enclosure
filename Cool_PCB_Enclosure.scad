@@ -23,7 +23,7 @@
 /* [ACTIVE_PARTS] */
 // - Coque
 Shield_Part = 1;// [0:No, 1:Yes]
-// - Coque Type
+// - Coque Typ0
 Shield_Type = 0;// [0:Bottom, 1:Top]
 // - Panel
 Panel_Part = 0;// [0:No, 1:Yes]
@@ -578,6 +578,11 @@ echo("START HEX MESH ...");
     h_area = [Box_Width - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
   translate([0, 0, -Box_Height/2 + Shield_thickness + hh/2]) 
     hexagonal_grid(box = h_area, hexagon_diameter = (rhd - hht)/sin(60), hexagon_thickness = hht);
+echo("DIME");
+    echo(h_area);
+    echo((rhd - hht)/sin(60));
+   echo(hht);
+    
 
     v_area1 = [Box_Height - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
 //    echo(v_area1);
@@ -1597,7 +1602,8 @@ module hexagonal_grid(box, hexagon_diameter, hexagon_thickness){
 // this diameter is 2/sqrt(3) times larger than flat to flat
 // third arg is wall thickness.  This also is measured that the corners, not the flats. 
 
-// example hexagonal_grid([25, 25, 5], 2.71, 0.133);
+// example 
+//    hexagonal_grid([25, 25, 5], 5, 1);
 
     difference(){
         cube(box, center = true);
@@ -1611,6 +1617,8 @@ module hex_hole(hexdiameter, height){
 }
 
 
+
+
 module hexgrid(box, hexagon_diameter, hexagon_thickness) {
     d = hexagon_diameter + hexagon_thickness;
     a = d*sin(60);
@@ -1618,25 +1626,29 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
     cos60 = cos(60);
     sin60 = sin(60);
     
-    moduloX = (box[0] % hexagon_diameter);
-    numX = (box[0] - moduloX) / hexagon_diameter;
+    moduloX = (box[0] % (3*d));
+    numX = (box[0] - moduloX) / (3*d);
     oddX = numX % 2;
-    numberX = numX + oddX;
+    numberX = numX;
+//    deltaX = oddX == 1 ? 0 : 0*d/2;
 
-    moduloY = (box[1] % hexagon_diameter);
-    numY = (box[1] - moduloY) / hexagon_diameter;
+    moduloY = (box[1] % a);
+    numY = (box[1] - moduloY) / a;
     oddY = numY % 2;
-    numberY = numY + oddY;
-    echo("************");
-    echo("TO DO: DISCERNING WHEN deltaX is 0 or a/2");
-    echo("************");
+    numberY = numY;
     
-// NOT ALWAYS CORRECT:
-    deltaX = oddX == 1 ? a/2 : 0;
+    deltaY = oddY == 1 ? a/2 : 0;
 
-    x0 = (numberX + 2) * d/2;
-    y0 = (numberY + 2) * a/2 + deltaX;
-
+// Center the central hexagon on the origin of coordinates    
+    u = [0, d/2, -d/2];
+    v0 = numX % 3 == 1 ? 1 : 0;
+    v1 = numX % 3 == 2 ? 1 : 0;
+    v2 = numX % 3 == 0 ? 1 : 0;
+    v=[v0, v1, v2];
+    deltaX = dot(u, v);
+    
+    x0 = (numberX + 2) * d  + deltaX; // + d;
+    y0 = (numberY + 2) * a/2 + deltaY;
 
     for(x = [-x0: 2*a*sin60 : x0]) {
         for(y = [-y0 : a : y0]) {
@@ -1645,6 +1657,7 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
         }
     }
 }
+  //  hexagonal_grid([172, 244, 3], 20.7846, 2);
 
 // * END OF HONEYCOMB
 
