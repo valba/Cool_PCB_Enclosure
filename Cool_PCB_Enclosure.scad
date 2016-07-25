@@ -44,7 +44,7 @@ Panel_Visible = 0;// [0:No, 1:Yes]
 
 /* [EXTERNAL_BOX_DIMENSIONS] */
 // - Longueur - Length  
-Box_Length = 80;       
+Box_Length = 89;       
 // - Largeur - Width
 Box_Width = 60;                     
 // - Hauteur - Height  
@@ -54,6 +54,10 @@ Box_Height = 40;
 /* [INTERNAL_BOX_DIMENSIONS] */
 // - Epaisseur - Shield thickness  
 Shield_thickness = 3;  
+// - 
+rail_thickness = 2;
+// -
+panel_thickness = 3;
 // - 
 reed_thickness = 2;
 // - 
@@ -67,7 +71,7 @@ rear_hexagon_diameter = 3;
 // -
 rear_hexagon_thickness = 3;
 // - Number of lateral screws
-nl_screws = 2;
+n_screws = 4;
 // -
 lateral_screw_diameter = 1.3;
 
@@ -488,7 +492,7 @@ echo("START RAILS ...");
       //external rail
       difference() {
         external_box1 = [Box_Length, Box_Width, Box_Height];
-        internal_box1 = [Box_Length - 2*honeycomb_hexagon_thickness, Box_Width + 0.001, Box_Height + 0.001];
+        internal_box1 = [Box_Length - 2*rail_thickness, Box_Width + 0.001, Box_Height + 0.001];
 
         rounded_polig4(external_box1, radius = Fillet);
         rounded_polig4(internal_box1, radius = Fillet);
@@ -496,8 +500,8 @@ echo("START RAILS ...");
 
       //internal rail
       difference(){        
-        external_box2 = [Box_Length - 2*honeycomb_hexagon_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness];
-        internal_box2 = [Box_Length - 4*honeycomb_hexagon_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness + 0.001, Box_Height - 2*Shield_thickness + 0.001];
+        external_box2 = [Box_Length - 2*rail_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness];
+        internal_box2 = [Box_Length - 4*rail_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness + 0.001, Box_Height - 2*Shield_thickness + 0.001];
 
         rounded_polig4(external_box2, radius = Fillet);
         rounded_polig4(internal_box2, radius = Fillet);
@@ -538,7 +542,7 @@ module shield(){
     for (i = [0 : 3] ){
       translate([external_Pos[i][0], 0, external_Pos[i][1]]) 
         rotate([90, 360/16, 0])
-          cylinder(r = Fillet, h = Box_Length - 4*honeycomb_hexagon_thickness - 2*Shield_thickness, center = true, $fn = 8);
+          cylinder(r = Fillet, h = Box_Length - 4*rail_thickness - 2*Shield_thickness, center = true, $fn = 8);
     } //fo
      
     for (i = [0 : 3] ){
@@ -556,17 +560,19 @@ echo("START HEX MESH ...");
   rhd = reed_hexagon_diameter;
   hht = honeycomb_hexagon_thickness;
   hh = honeycomb_height;
+  rt = rail_thickness;
+  pt = panel_thickness;
 
-    h_area = [Box_Width - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
+    h_area = [Box_Width - 2*Shield_thickness, Box_Length - 4*rt - 2*pt, hh];
   translate([0, 0, -Box_Height/2 + Shield_thickness + hh/2]) 
     hexagonal_grid(box = h_area, hexagon_diameter = (rhd - hht)/sin60, hexagon_thickness = hht);  
 
-    v_area1 = [Box_Height - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
+    v_area1 = [Box_Height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt, hh];
 //    echo(v_area1);
   translate([-Box_Width/2 + Shield_thickness + hh/2, 0, 0]) rotate([0, 90, 0]) 
     hexagonal_grid(box = v_area1, hexagon_diameter = 2/sqrt(3)*rhd - hht, hexagon_thickness = hht);
 
-    v_area2 = [Box_Height - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
+    v_area2 = [Box_Height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt, hh];
   translate([Box_Width/2 - Shield_thickness - hh/2, 0, 0]) rotate([0, 90, 0]) 
     hexagonal_grid(box = v_area2, hexagon_diameter = 2/sqrt(3)*rhd - hht, hexagon_thickness = hht);
   echo("--> END HEX MESH");
@@ -576,37 +582,58 @@ echo("START HEX MESH ...");
 module reeds(){
 echo("START REEDS ..."); 
   // Reeds
-  modulo = (Box_Length - 6*Shield_thickness) % reed_hexagon_diameter;
-  total_num = ((Box_Length - 6*Shield_thickness) - modulo) / reed_hexagon_diameter;
+  reed_length = Box_Length - 2*panel_thickness - 4*rail_thickness;
+  modulo = reed_length % reed_hexagon_diameter;
+  total_num = (reed_length - modulo) / reed_hexagon_diameter;
   difference() {        // Fixation box legs
     union() {
       for (i = [1 : total_num]) {
         //color("red") 
-        translate([(- Box_Width)/2 + Shield_thickness + reed_thickness/2, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter , 0])
+        translate([(- Box_Width)/2 + Shield_thickness + reed_thickness/2, (reed_length - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter , 0])
           rotate([90, 0, 90])
               cylinder(d = reed_hexagon_diameter + 0.001, h = reed_thickness, center = true, $fn=6);
       } //fo
     } //un
     // Lateral screws
-    if (Lateral_Screws_Active)
-  color("red")  
-    union() {
-      for (j = [1 : (total_num -  total_num%(nl_screws - 1))/(nl_screws - 1) + 1 : total_num]) {
-        translate([(- Box_Width)/2 + Shield_thickness + reed_thickness/2, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter , reed_hexagon_diameter*sin60/4])
-          rotate([90, 0, 90])
-            translate ([0, 0, 0]) cylinder(d = lateral_screw_diameter, h = reed_thickness, center = true, $fn=64);
-      } //fo
-      j = total_num;
-        translate([(- Box_Width)/2 + Shield_thickness + reed_thickness/2, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter , reed_hexagon_diameter*sin60/4])
-          rotate([90, 0, 90])
-            translate ([0, 0, 0]) cylinder(d = lateral_screw_diameter, h = reed_thickness, center = true, $fn=64);
-    } //un
+    if (Lateral_Screws_Active) {
+    inicio = (total_num % 2 == 0) ? (n_screws % 2 == 0 ? -reed_hexagon_diameter/2 : -reed_hexagon_diameter/2) : 0; 
+    nl_screws = (total_num % 2 == 0) ? (n_screws % 2 == 0 ? n_screws : n_screws - 1) : n_screws;
+    step = (total_num % 2 == 0) ? (total_num -  total_num%(nl_screws))/(nl_screws) : (total_num + 1 -  (total_num + 1)%(nl_screws))/(nl_screws);
+    num = (total_num % 2 == 0) ? total_num/2 - step : (total_num)/2 - step;
+        echo("step = ", step);
+        echo("total_num = ", total_num);
+        echo("step = ", step);
+    color("red") 
+      union() {
+        for (j = [step : step : num]) {
+              translate([- Box_Width/2 + Shield_thickness + reed_thickness/2, j * reed_hexagon_diameter + inicio, reed_hexagon_diameter * sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64); 
+              translate([- Box_Width/2 + Shield_thickness + reed_thickness/2, - j * reed_hexagon_diameter - inicio, reed_hexagon_diameter * sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64); 
+        } //fo
+      // center one
+      if (nl_screws % 2 != 0)  
+        translate([- Box_Width/2 + Shield_thickness + reed_thickness/2, 0, reed_hexagon_diameter*sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64); 
+      // first one
+      translate([- Box_Width/2 + Shield_thickness + reed_thickness/2, (reed_length - modulo - reed_hexagon_diameter)/2, reed_hexagon_diameter*sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64);         
+      // last one
+      translate([- Box_Width/2 + Shield_thickness + reed_thickness/2, (reed_length - modulo - reed_hexagon_diameter)/2 - (total_num - 1) * reed_hexagon_diameter, reed_hexagon_diameter*sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64);         
+      } //un
+   }     
       // bevel
     angle = atan(2*reed_thickness / reed_hexagon_diameter);
     translate([- Box_Width/2 + Shield_thickness + reed_thickness/2, 0, - reed_hexagon_diameter/2])
       //color("blue")
       rotate([0, angle, 0]) 
-        cube([reed_thickness, (Box_Length - 6*Shield_thickness - modulo), reed_hexagon_diameter], center = true);
+        cube([reed_thickness, (reed_length - modulo), reed_hexagon_diameter], center = true);
   }//di (Fixation box legs)
 echo("--> END REEDS"); 
 } //mo
@@ -615,13 +642,14 @@ echo("--> END REEDS");
 module antireeds(){
 echo("START ANTI-REEDS ..."); 
   // Reeds
-  modulo = (Box_Length - 6*Shield_thickness) % reed_hexagon_diameter;
-  total_num = ((Box_Length - 6*Shield_thickness) - modulo) / reed_hexagon_diameter;
+  reed_length = Box_Length - 2*panel_thickness - 4*rail_thickness;
+  modulo = reed_length % reed_hexagon_diameter;
+  total_num = (reed_length - modulo) / reed_hexagon_diameter;
   difference() {        // Fixation box legs
     union() {
       for (i = [1 : total_num]) {
         //color("red") 
-        translate([(Box_Width)/2 - Shield_thickness - reed_thickness/2, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter , 0])
+        translate([(Box_Width)/2 - Shield_thickness - reed_thickness/2, (reed_length - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter , 0])
 // cube([reed_thickness, reed_hexagon_diameter * total_num, reed_hexagon_diameter], center = true );
                    rotate([90, 0, 90])
  //           difference() {
@@ -636,53 +664,84 @@ echo("START ANTI-REEDS ...");
 //    translate([- Box_Width/2 + Shield_thickness + reed_thickness/2, 0, - reed_hexagon_diameter/2])
       //color("blue")
 //      rotate([0, angle, 0]) 
-//        cube([reed_thickness, (Box_Length - 6*Shield_thickness - modulo), reed_hexagon_diameter], center = true);
+//        cube([reed_thickness, (reed_length - modulo), reed_hexagon_diameter], center = true);
   }//di (Fixation box legs)
 echo("--> END ANTI-REEDS"); 
 } //mo
 
 
 module pegs(){
-      modulo = (Box_Length - 6*Shield_thickness) % reed_hexagon_diameter;
-      total_num = ((Box_Length - 6*Shield_thickness) - modulo) / reed_hexagon_diameter;
+  reed_length = Box_Length - 2*panel_thickness - 4*rail_thickness;
+  modulo = reed_length % reed_hexagon_diameter;
+  total_num = (reed_length - modulo) / reed_hexagon_diameter;
 echo("START PEGS ..."); 
 // Edge's pegs
-  for (j = [1 : (total_num -  total_num%(nl_screws - 1))/(nl_screws - 1) + 1 : total_num]) {
+    inicio = (total_num % 2 == 0) ? (n_screws % 2 == 0 ? -reed_hexagon_diameter/2 : -reed_hexagon_diameter/2) : 0; 
+    nl_screws = (total_num % 2 == 0) ? (n_screws % 2 == 0 ? n_screws : n_screws - 1) : n_screws;
+    step = (total_num % 2 == 0) ? (total_num -  total_num%(nl_screws))/(nl_screws) : (total_num + 1 -  (total_num + 1)%(nl_screws))/(nl_screws);
+    num = (total_num % 2 == 0) ? total_num/2 - step : (total_num)/2 - step;
     color("blue") 
-      translate([(Box_Width/2 - Shield_thickness/2), (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter, 0])
+      union() {
+        for (j = [step : step : num]) {
+        translate([(Box_Width/2 - Shield_thickness/2), j * reed_hexagon_diameter + inicio, 0])
+          sphere (r = Shield_thickness/4, center = true, $fn=64); 
+        translate([(Box_Width/2 - Shield_thickness/2), - j * reed_hexagon_diameter - inicio, 0])
+          sphere (r = Shield_thickness/4, center = true, $fn=64); 
+        } //fo
+      // center one
+      if (nl_screws % 2 != 0)  
+        translate([(Box_Width/2 - Shield_thickness/2), 0, 0])
         sphere (r = Shield_thickness/4, center = true, $fn=64); 
-  } //fo
-  j = total_num;
-    color("blue") 
-      translate([(Box_Width/2 - Shield_thickness/2), (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter, 0])
+      // first one
+        translate([(Box_Width/2 - Shield_thickness/2), (reed_length - modulo - reed_hexagon_diameter)/2, 0])
         sphere (r = Shield_thickness/4, center = true, $fn=64); 
+      // last one
+        translate([(Box_Width/2 - Shield_thickness/2), (reed_length - modulo - reed_hexagon_diameter)/2 - (total_num - 1) * reed_hexagon_diameter, 0])
+        sphere (r = Shield_thickness/4, center = true, $fn=64); 
+    } //un
 echo("--> END PEGS"); 
 } //mo
 
 
 //module antipegs(total_num, reed_hexagon_diameter, modulo){
 module antipegs(){
-      modulo = (Box_Length - 6*Shield_thickness) % reed_hexagon_diameter;
-      total_num = ((Box_Length - 6*Shield_thickness) - modulo) / reed_hexagon_diameter;
+  reed_length = Box_Length - 2*panel_thickness - 4*rail_thickness;
+  modulo = reed_length % reed_hexagon_diameter;
+  total_num = (reed_length - modulo) / reed_hexagon_diameter;
 echo("START ANTI-PEGS ..."); 
 // Edge's anti-pegs
-  for (j = [1 : (total_num -  total_num%(nl_screws - 1))/(nl_screws - 1) + 1 : total_num]) {
-      color("blue") 
-        translate([-(Box_Width/2 - Shield_thickness/2), (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter, 0])
+    inicio = (total_num % 2 == 0) ? (n_screws % 2 == 0 ? -reed_hexagon_diameter/2 : -reed_hexagon_diameter/2) : 0; 
+    nl_screws = (total_num % 2 == 0) ? (n_screws % 2 == 0 ? n_screws : n_screws - 1) : n_screws;
+    step = (total_num % 2 == 0) ? (total_num -  total_num%(nl_screws))/(nl_screws) : (total_num + 1 -  (total_num + 1)%(nl_screws))/(nl_screws);
+    num = (total_num % 2 == 0) ? total_num/2 - step : (total_num)/2 - step;
+    color("blue") 
+      union() {
+        for (j = [step : step : num]) {
+        translate([-(Box_Width/2 - Shield_thickness/2), j * reed_hexagon_diameter + inicio, 0])
           cylinder(d = Shield_thickness/2, h = 2 * Shield_thickness, center = true, $fn=64); 
-  } //fo
-  j = total_num;
-      color("blue") 
-        translate([-(Box_Width/2 - Shield_thickness/2), (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter, 0])
+        translate([-(Box_Width/2 - Shield_thickness/2), - j * reed_hexagon_diameter - inicio, 0])
           cylinder(d = Shield_thickness/2, h = 2 * Shield_thickness, center = true, $fn=64); 
+        } //fo
+      // center one
+      if (nl_screws % 2 != 0)  
+        translate([-(Box_Width/2 - Shield_thickness/2), 0, 0])
+          cylinder(d = Shield_thickness/2, h = 2 * Shield_thickness, center = true, $fn=64); 
+      // first one
+        translate([-(Box_Width/2 - Shield_thickness/2), (reed_length - modulo - reed_hexagon_diameter)/2, 0])
+          cylinder(d = Shield_thickness/2, h = 2 * Shield_thickness, center = true, $fn=64); 
+      // last one
+        translate([-(Box_Width/2 - Shield_thickness/2), (reed_length - modulo - reed_hexagon_diameter)/2 - (total_num - 1) * reed_hexagon_diameter, 0])
+          cylinder(d = Shield_thickness/2, h = 2 * Shield_thickness, center = true, $fn=64); 
+    } //un
 echo("--> END ANTI-PEGS"); 
 } //mo
 
 
 module ventilation_holes(){      
 echo("START VENTILATION HOLES ..."); 
-      modulo = (Box_Length - 6*Shield_thickness) % reed_hexagon_diameter;
-      total_num = ((Box_Length - 6*Shield_thickness) - modulo) / reed_hexagon_diameter;
+  reed_length = Box_Length - 2*panel_thickness - 4*rail_thickness;
+  modulo = reed_length % reed_hexagon_diameter;
+  total_num = (reed_length - modulo) / reed_hexagon_diameter;
       // Ventilation Holes
       rotate ([0, 0, 90]) 
         union() {
@@ -699,21 +758,36 @@ echo("START VENTILATION HOLES ...");
           } //fo
         } //un
     // Lateral screws
-    if (Lateral_Screws_Active)
+    if (Lateral_Screws_Active) {
+    inicio = (total_num % 2 == 0) ? (n_screws % 2 == 0 ? -reed_hexagon_diameter/2 : -reed_hexagon_diameter/2) : 0; 
+    nl_screws = (total_num % 2 == 0) ? (n_screws % 2 == 0 ? n_screws : n_screws - 1) : n_screws;
+    step = (total_num % 2 == 0) ? (total_num -  total_num%(nl_screws))/(nl_screws) : (total_num + 1 -  (total_num + 1)%(nl_screws))/(nl_screws);
+    num = (total_num % 2 == 0) ? total_num/2 - step : (total_num)/2 - step;
+    color("red") 
       union() {
-        for (j = [1 : (total_num -  total_num%(nl_screws - 1))/(nl_screws - 1) + 1 : total_num]) {
-            color("red") 
-              translate([Box_Width/2 - Shield_thickness, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter, -reed_hexagon_diameter*sin60/4])
+        for (j = [step : step : num]) {
+              translate([Box_Width/2 - Shield_thickness, j * reed_hexagon_diameter + inicio, - reed_hexagon_diameter * sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64); 
+              translate([Box_Width/2 - Shield_thickness, - j * reed_hexagon_diameter - inicio, - reed_hexagon_diameter * sin60/4])
                rotate([90, 0, 90])
                  cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64); 
         } //fo
-        j = total_num;
-            color("red") 
-              translate([Box_Width/2 - Shield_thickness, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter, -reed_hexagon_diameter*sin60/4])
+      // center one
+      if (nl_screws % 2 != 0)  
+        translate([Box_Width/2 - Shield_thickness, 0, -reed_hexagon_diameter*sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64); 
+      // first one
+      translate([Box_Width/2 - Shield_thickness, (reed_length - modulo - reed_hexagon_diameter)/2, -reed_hexagon_diameter*sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64);         
+      // last one
+      translate([Box_Width/2 - Shield_thickness, (reed_length - modulo - reed_hexagon_diameter)/2 - (total_num - 1) * reed_hexagon_diameter, -reed_hexagon_diameter*sin60/4])
                rotate([90, 0, 90])
                  cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64);         
       } //un
-       
+   }     
       echo("--> END VENTILATION HOLES"); 
 } //mo
 
