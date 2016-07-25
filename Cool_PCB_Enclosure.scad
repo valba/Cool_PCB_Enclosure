@@ -22,9 +22,9 @@
 
 /* [ACTIVE_PARTS] */
 // - Coque
-Shield_Active = 0;// [0:No, 1:Yes]
-// - Coque Typ0
-Shield_Type = 0;// [0:Bottom, 1:Top]
+Shield_Active = 1;// [0:No, 1:Yes]
+// - Coque Type
+Shield_Type = 0;//[0:Bottom, 1:Top]
 // - Panel
 Panel_Active = 0;// [0:No, 1:Yes]
 // - Coque Type
@@ -44,31 +44,32 @@ Panel_Visible = 0;// [0:No, 1:Yes]
 
 /* [EXTERNAL_BOX_DIMENSIONS] */
 // - Longueur - Length  
-Box_Length = 380;       
+Box_Length = 80;       
 // - Largeur - Width
-Box_Width = 180;                     
+Box_Width = 60;                     
 // - Hauteur - Height  
-Box_Height = 120;  
+Box_Height = 40;  
 
 
 /* [INTERNAL_BOX_DIMENSIONS] */
 // - Epaisseur - Shield thickness  
-Shield_thickness = 5;  
+Shield_thickness = 3;  
 // - 
-reed_thickness = 4;
+reed_thickness = 2;
 // - 
-reed_hexagon_diameter =20;
+reed_hexagon_diameter =8;
 // - 
-honeycomb_hexagon_thickness = 2;
+honeycomb_hexagon_thickness = 1;
 // - 
-honeycomb_height = 3;
+honeycomb_height = 1;
 // - 
-rear_hexagon_diameter = 10;
+rear_hexagon_diameter = 3;
 // -
 rear_hexagon_thickness = 3;
 // - Number of lateral screws
-nl_screws = 4;
-
+nl_screws = 2;
+// -
+lateral_screw_diameter = 1.3;
 
 /* [EXTERNAL_BOX_PARAMETERS) ] */
 // - Decorations to ventilation holes
@@ -82,7 +83,7 @@ TxtSize       = 3;
 // - Font  
 Police        ="Arial Black"; 
 // - Diamètre Coin arrondi - Fillet diameter  
-Fillet         = 12;//[0.1:12] 
+Fillet         = 4;//[0.1:12] 
 // - lissage de l'arrondi - Fillet smoothness  
 Resolution    = 64;//[1:100] 
 // - Tolérance - Tolerance (Panel/rails gap)
@@ -105,15 +106,15 @@ BPCB3_item = 0;// [0:No, 1:Yes]
 // - Bottom PCB4
 BPCB4_item = 0;// [0:No, 1:Yes]
 // - Power Supply
-PS_item = 1;// [0:No, 1:Yes]
+PS_item = 0;// [0:No, 1:Yes]
 // - Pillar #1
-Pillar1_item = 1;// [0:No, 1:Yes]
+Pillar1_item = 0;// [0:No, 1:Yes]
 // - Pillar #2
-Pillar2_item = 1;// [0:No, 1:Yes]
+Pillar2_item = 0;// [0:No, 1:Yes]
 // - Pillar #3
-Pillar3_item = 1;// [0:No, 1:Yes]
+Pillar3_item = 0;// [0:No, 1:Yes]
 // - Pillar #4
-Pillar4_item = 1;// [0:No, 1:Yes]
+Pillar4_item = 0;// [0:No, 1:Yes]
 // - Pillar #5
 Pillar5_item = 0;// [0:No, 1:Yes]
 // - Pillar #6
@@ -122,7 +123,7 @@ Pillar6_item = 0;// [0:No, 1:Yes]
   
 /* [TOP_SHIELD_ITEMS] */
 // - Top Fan Grill
-TFan_Grill_item = 1;// [0:No, 1:Yes]
+TFan_Grill_item = 0;// [0:No, 1:Yes]
 // - Top PCB1
 TPCB1_item = 0;// [0:No, 1:Yes]
 // - Top PCB2
@@ -357,6 +358,11 @@ hexagon_extra_distance = 0;
 
 /* [HIDDEN] */
 
+    
+cos60 = cos(60);
+sin60 = sin(60);
+
+
 if (Shield_Active == 1) {
   if  (Shield_Type == 0) {
     echo("Bottom_Shield_Active");
@@ -553,7 +559,7 @@ echo("START HEX MESH ...");
 
     h_area = [Box_Width - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
   translate([0, 0, -Box_Height/2 + Shield_thickness + hh/2]) 
-    hexagonal_grid(box = h_area, hexagon_diameter = (rhd - hht)/sin(60), hexagon_thickness = hht);  
+    hexagonal_grid(box = h_area, hexagon_diameter = (rhd - hht)/sin60, hexagon_thickness = hht);  
 
     v_area1 = [Box_Height - 2*Shield_thickness, Box_Length - 4*hht - 2*Shield_thickness, hh];
 //    echo(v_area1);
@@ -586,14 +592,14 @@ echo("START REEDS ...");
   color("red")  
     union() {
       for (j = [1 : (total_num -  total_num%(nl_screws - 1))/(nl_screws - 1) + 1 : total_num]) {
-        translate([(- Box_Width)/2 + Shield_thickness + reed_thickness/2, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter , 0])
+        translate([(- Box_Width)/2 + Shield_thickness + reed_thickness/2, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter , reed_hexagon_diameter*sin60/4])
           rotate([90, 0, 90])
-            translate ([0, 4, 0]) cylinder(d = 2, h = reed_thickness, center = true, $fn=64);
+            translate ([0, 0, 0]) cylinder(d = lateral_screw_diameter, h = reed_thickness, center = true, $fn=64);
       } //fo
       j = total_num;
-        translate([(- Box_Width)/2 + Shield_thickness + reed_thickness/2, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter , 0])
+        translate([(- Box_Width)/2 + Shield_thickness + reed_thickness/2, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter , reed_hexagon_diameter*sin60/4])
           rotate([90, 0, 90])
-            translate ([0, 4, 0]) cylinder(d = 2, h = reed_thickness, center = true, $fn=64);
+            translate ([0, 0, 0]) cylinder(d = lateral_screw_diameter, h = reed_thickness, center = true, $fn=64);
     } //un
       // bevel
     angle = atan(2*reed_thickness / reed_hexagon_diameter);
@@ -621,7 +627,7 @@ echo("START ANTI-REEDS ...");
  //           difference() {
               cylinder(d = reed_hexagon_diameter + honeycomb_hexagon_thickness, h = reed_thickness, center = true, $fn=6);
  //             if ( (i == 1) || (i == total_num) || (i == (total_num - total_num%2)/2 + 1) ) {  
-   //             translate ([0, 4, 0]) cylinder(d = 2, h = reed_thickness, center = true, $fn=64);
+   //             translate ([0, 4, 0]) cylinder(d = lateral_screw_diameter, h = reed_thickness, center = true, $fn=64);
    //           }
     //        } //di
       } //fo
@@ -697,15 +703,15 @@ echo("START VENTILATION HOLES ...");
       union() {
         for (j = [1 : (total_num -  total_num%(nl_screws - 1))/(nl_screws - 1) + 1 : total_num]) {
             color("red") 
-              translate([Box_Width/2 - Shield_thickness, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter, -4])
+              translate([Box_Width/2 - Shield_thickness, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter, -reed_hexagon_diameter*sin60/4])
                rotate([90, 0, 90])
-                 cylinder(d = 2, h = 2*Shield_thickness, center = true, $fn=64); 
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64); 
         } //fo
         j = total_num;
             color("red") 
-              translate([Box_Width/2 - Shield_thickness, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter, -4])
+              translate([Box_Width/2 - Shield_thickness, (Box_Length - 6*Shield_thickness - modulo - reed_hexagon_diameter)/2 - (j - 1) * reed_hexagon_diameter, -reed_hexagon_diameter*sin60/4])
                rotate([90, 0, 90])
-                 cylinder(d = 2, h = 2*Shield_thickness, center = true, $fn=64);         
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=64);         
       } //un
        
       echo("--> END VENTILATION HOLES"); 
@@ -1031,7 +1037,7 @@ module bottom_shield(active, visible) {
   if (active == 1){
    difference(){
     bshield(bottom_active = 1, bottom_visible = 0);
-      translate([0, -200, 0])
+/*      translate([0, -200, 0])
        cube ([400, 400, 400], center = true);
             color("blue") 
         translate([-50, 0, -(Box_Height/2 - Shield_thickness/2)])
@@ -1058,13 +1064,13 @@ module bottom_shield(active, visible) {
              rotate([90, 0, 0]) 
           cylinder(d = Shield_thickness/2, h = Shield_thickness/2, center = true, $fn=64); 
 
-
+*/
    } //di
     /*      
  
       }
 */      
-        rotate([0,180,0]) tshield(top_active = 1, top_visible=0); //Uncomment in order to visualize both shields matched.
+     //   rotate([0,180,0]) tshield(top_active = 1, top_visible=0); //Uncomment this line in order to visualize both shields matched.
   }
   else
     if (visible == 1) %bshield(bottom_active = 0, bottom_visible = 1);
@@ -1457,10 +1463,7 @@ module hex_hole(hexdiameter, height){
 
 module hexgrid(box, hexagon_diameter, hexagon_thickness) {
     d = hexagon_diameter + hexagon_thickness;
-    a = d*sin(60);
-    
-    cos60 = cos(60);
-    sin60 = sin(60);
+    a = d*sin60;
     
     moduloX = (box[0] % (3*d));
     numX = (box[0] - moduloX) / (3*d);
@@ -1503,12 +1506,12 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
 module front_panel(active, visible) {
   union() {
     if (active == 1)
-      translate([0, - Box_Length/2 + honeycomb_hexagon_thickness + m/2, 0]) 
+      translate([0, - Box_Length/2 + honeycomb_hexagon_thickness, 0]) 
         rotate([90, 0, 0])
         FPanel();
     else
       if (visible == 1)
-        translate([0, - Box_Length/2 + honeycomb_hexagon_thickness + m/2, 0]) 
+        translate([0, - Box_Length/2 + honeycomb_hexagon_thickness, 0]) 
         rotate([90, 0, 0])
           %FPanel();
   }    
