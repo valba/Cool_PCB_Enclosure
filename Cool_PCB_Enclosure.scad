@@ -26,8 +26,8 @@ Shield_Active = 1;// [0:No, 1:Yes]
 // - Coque Type
 Shield_Type = 0;//[0:Bottom, 1:Top]
 // - Panel
-Panel_Active = 0;// [0:No, 1:Yes]
-// - Coque Type
+Panel_Active = 1;// [0:No, 1:Yes]
+// - Coque Type 
 Panel_Type = 0;// [0:Rear, 1:Front]
 // - Lateral screws
 Lateral_Screws_Active = 1;// [0:No, 1:Yes]
@@ -69,7 +69,7 @@ honeycomb_hexagon_thickness = 1;
 // - 
 honeycomb_height = 3;
 // - 
-rear_hexagon_diameter = 3;
+rear_hexagon_diameter = 10;
 // -
 rear_hexagon_thickness = 3;
 // - Number of lateral screws
@@ -1549,23 +1549,24 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
     numX = (box[0] - moduloX) / a;
     oddX = numX % 2;
     numberX = numX;
-    deltaX = oddX == 1 ? a/2 : 0;
-//    deltaX = oddX == 1 ? 0 : 0*d/2;
 
     moduloY = (box[1] % a);
     numY = (box[1] - moduloY) / a;
     oddY = numY % 2;
     numberY = numY;
     
-    deltaY = oddY == 1 ? 0 : a/2;
 
 // Center the central hexagon on the origin of coordinates    
-    u = [0, d/2, -d/2];
-    v0 = numX % 3 == 1 ? 1 : 0;
-    v1 = numX % 3 == 2 ? 1 : 0;
-    v2 = numX % 3 == 0 ? 1 : 0;
+/*    u = [0, a/2, -a/2];
+    v0 = numX % 2 == 1 ? 1 : 0;
+    v1 = numX % 2 == 2 ? 1 : 0;
+    v2 = numX % 2 == 0 ? 1 : 0;
     v=[v0, v1, v2];
-//    deltaX = u[0]*v[0]+u[1]*v[1]+u[2]*v[2];    
+    deltaX = u[0]*v[0]+u[1]*v[1]+u[2]*v[2];    
+*/
+    deltaX = oddX == 1 ? a/2 : 0;
+//    deltaX = oddX == 1 ? 0 : 0*d/2;
+    deltaY = oddY == 1 ? 0 : a/2;
 
     x0 = (numberX + 2) * a/2 + deltaX;
     y0 = (numberY + 2) * a/2 + deltaY;
@@ -1734,6 +1735,14 @@ rotate([0, 180 , 0]) {
       rotate([0, 0, 0])    
         Fan_grille(fan_active = 1, plate_thickness = panel_thickness); 
   }
+  else 
+    translate([FanPosX + 15, FanPosY, 0])
+      rotate([0, 0, 30])    
+        intersection(){
+//    rounded_polig6(hexagon_vertices(r = 40), Shield_thickness + 0.001, 5);
+          cylinder(d = FanDia, h = Shield_thickness + 0.001, center = true);
+          hexagonal_grid([FanDia, FanDia, Shield_thickness], rear_hexagon_diameter, rear_hexagon_thickness);
+        } //in
   } //ro
 echo("---> END REAR PANEL"); 
 } //mo
