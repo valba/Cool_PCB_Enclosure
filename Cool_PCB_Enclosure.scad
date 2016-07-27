@@ -51,15 +51,24 @@ Box_Width = 180;
 Box_Height = 120;  
 
 
-/* [INTERNAL_BOX_DIMENSIONS] */
+/* [EXTERNAL_BOX_PARAMETERS) ] */
+// - Decorations to ventilation holes
+Vent          = 1;// [0:No, 1:Yes]
+// - Decoration-Holes width (in mm)
+Vent_width    = 1 ;   
+// - Diamètre Coin arrondi - Fillet diameter  
+Fillet         = 12;//[0.1:16] 
+// - lissage de l'arrondi - Fillet smoothness  
+Resolution    = 128;//[1:256] 
+
+
+/* [INTERNAL_BOX_PARAMETERS] */
 // - Epaisseur - Shield thickness  
 Shield_thickness = 5;  
 // - 
 rail_thickness = 4;
 // - Tolérance - Tolerance (Panel/rails gap)
 fitting_factor = 0.9;
-// -
-panel_thickness = Shield_thickness * fitting_factor;
 // - 
 reed_thickness = 4;
 // - 
@@ -68,34 +77,10 @@ reed_hexagon_diameter = 20;
 honeycomb_hexagon_thickness = 1;
 // - 
 honeycomb_height = 3;
-// - 
-rear_hexagon_diameter = 10;
-// -
-rear_hexagon_thickness = 3;
 // - Number of lateral screws
 n_screws = 4;
 // -
 lateral_screw_diameter = 1.3;
-
-/* [EXTERNAL_BOX_PARAMETERS) ] */
-// - Decorations to ventilation holes
-Vent          = 1;// [0:No, 1:Yes]
-// - Decoration-Holes width (in mm)
-Vent_width    = 1 ;   
-// - Text you want
-txt           = "Cool Box";           
-// - Font size  
-TxtSize       = 3;                 
-// - Font  
-Police        ="Arial Black"; 
-// - Diamètre Coin arrondi - Fillet diameter  
-Fillet         = 12;//[0.1:16] 
-// - lissage de l'arrondi - Fillet smoothness  
-Resolution    = 128;//[1:256] 
-// - Texte façade - Front text
-Main_Text_Panel = 0;// [0:No, 1:Yes]
-// - Panneau avant - Front panel
-
 
   
 /* [BOTTOM_SHIELD_ITEMS] */
@@ -142,6 +127,24 @@ TPCB4_item = 0;// [0:No, 1:Yes]
 /* [REAR_PANEL_ITEMS] */
 // - Rear Fan Grill
 RFan_Grill_item = 1;// [0:No, 1:Yes]
+// - 
+rear_hexagon_diameter = 10;
+// -
+rear_hexagon_thickness = 3;
+// -
+panel_thickness = Shield_thickness * fitting_factor;
+
+
+/* [FRONT_PANEL_ITEMS] */
+// - Panneau avant - Front panel
+// - Text you want
+txt           = "Cool Box";           
+// - Font size  
+TxtSize       = 3;                 
+// - Font  
+Police        ="Arial Black"; 
+// - Texte façade - Front text
+Main_Text_Panel = 0;// [0:No, 1:Yes]
 
 
 
@@ -155,6 +158,7 @@ PCBFootDia         = 10;
 // - Diamètre trou - Hole diameter
 PCBFootHole        = 3.5;  
 
+// - Power Supply Heuteur pied - Power Supply Feet height
 PSF_Height = 25;
 PSF_ext_dia = 15;
 PSF_int_dia = 3.4;
@@ -162,13 +166,13 @@ PSF_bh_dia = 7.25;
 PSF_bh_height = PSF_Height - 4;
 PSF_Fillet = 12;
 
+// - Heuteur Pillar - Pillar height
 Pillar_Height = Box_Height/2 - Shield_thickness;
 Pillar_ext_dia = 20;
 Pillar_int_dia = 4.1;
 Pillar_bh_dia = 7.83;
 Pillar_bh_height = Box_Height/2 - 7;
 Pillar_Fillet = 12;
-
 
 
 /* [PS_FEET_PARAMETERS) ] */
@@ -365,6 +369,8 @@ hexagon_extra_distance = 0;
     
 cos60 = cos(60);
 sin60 = sin(60);
+// -
+panel_thickness = Shield_thickness * fitting_factor;
 
 
 if (Shield_Active == 1) {
@@ -1679,7 +1685,7 @@ rotate([0, 180 , 0]) {
       rounded_polig4([panel_thickness, panel_length, panel_height], Fillet);
 
     // Plug hole
-          f = 1.7;
+          f = 1.75;
     translate([- 45, -30, 5])     
       rounded_polig6(trapezoid_vertex(27.5*f, 19.4*f, 14*f, 12.4*f), 10, 2*f);
 
