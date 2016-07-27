@@ -26,7 +26,7 @@ Shield_Active = 1;// [0:No, 1:Yes]
 // - Coque Type
 Shield_Type = 0;//[0:Bottom, 1:Top]
 // - Panel
-Panel_Active = 1;// [0:No, 1:Yes]
+Panel_Active = 0;// [0:No, 1:Yes]
 // - Coque Type 
 Panel_Type = 0;// [0:Rear, 1:Front]
 // - Lateral screws
@@ -44,11 +44,11 @@ Panel_Visible = 0;// [0:No, 1:Yes]
 
 /* [EXTERNAL_BOX_DIMENSIONS] */
 // - Longueur - Length  
-Box_Length = 300;       
+Box_Length = 370;       
 // - Largeur - Width
-Box_Width = 180;                     
+Box_Width = 185; //185*0.99;                     
 // - Hauteur - Height  
-Box_Height = 120;  
+Box_Height = 125; //125*0.99;  
 
 
 /* [EXTERNAL_BOX_PARAMETERS) ] */
@@ -67,8 +67,6 @@ Resolution    = 128;//[1:256]
 Shield_thickness = 5;  
 // - 
 rail_thickness = 4;
-// - Tolérance - Tolerance (Panel/rails gap)
-fitting_factor = 0.9;
 // - 
 reed_thickness = 4;
 // - 
@@ -131,9 +129,10 @@ RFan_Grill_item = 1;// [0:No, 1:Yes]
 rear_hexagon_diameter = 10;
 // -
 rear_hexagon_thickness = 3;
+// - Tolérance - Tolerance (Panel/rails gap)
+fitting_factor = 0.99;
 // -
-panel_thickness = Shield_thickness * fitting_factor;
-
+panel_thickness = 4.5;
 
 /* [FRONT_PANEL_ITEMS] */
 // - Panneau avant - Front panel
@@ -369,8 +368,8 @@ hexagon_extra_distance = 0;
     
 cos60 = cos(60);
 sin60 = sin(60);
-// -
-panel_thickness = Shield_thickness * fitting_factor;
+
+echo("** panel_thickness = ", panel_thickness);
 
 
 if (Shield_Active == 1) {
@@ -1118,7 +1117,7 @@ module bottom_shield(active, visible) {
   if (active == 1){
    difference(){
     bshield(bottom_active = 1, bottom_visible = 0);
-/*      translate([0, -200, 0])
+      translate([0, -200, 0])
        cube ([400, 400, 400], center = true);
             color("blue") 
         translate([-50, 0, -(Box_Height/2 - Shield_thickness/2)])
@@ -1145,7 +1144,7 @@ module bottom_shield(active, visible) {
              rotate([90, 0, 0]) 
           cylinder(d = Shield_thickness/2, h = Shield_thickness/2, center = true, $fn=Resolution); 
 
-*/
+
    } //di
     /*      
  
@@ -1627,14 +1626,15 @@ module rear_panel(active, RPanel_visible) {
 // - FPANEL
 module FPanel(){
   echo("START FRONT PANEL ..."); 
-    panel_height = Box_Height - 2*Shield_thickness * fitting_factor;
-    panel_length = Box_Width - 2*Shield_thickness * fitting_factor;
-    difference(){
+    panel_height = (Box_Height - 2*Shield_thickness) * fitting_factor;
+    panel_width = (Box_Width - 2*Shield_thickness) * fitting_factor;
+    panel_thick = panel_thickness * fitting_factor;
+   difference(){
         color(Couleur2)
         //Panel(Length,Width,Thick,Fillet);
         //translate([0, 0, -panel_height/2]) 
         rotate([90, 0, 0])
-        rounded_polig4([panel_thickness, panel_length, panel_height], Fillet);
+        rounded_polig4([panel_thick, panel_width, panel_height], Fillet);
     
 //    translate([0, 0, 0 ])
     rotate([0,0,0]){
@@ -1646,7 +1646,7 @@ module FPanel(){
         CylinderHole(1, -68, -5, 8);       //(On/Off, Xpos, Ypos, Diameter)
         CylinderHole(1, -48, -5, 8);
         CylinderHole(1, -28, -5, 8);
-        SquareHole  (1, -Box_Width/5, 14, 80, 20, 2);
+        SquareHole  (1, -panel_width/5, 14, 80, 20, 2);
         CylinderHole(1, 0, -15, 10);
         SquareHole  (1, 50, 0, 30, 40, 3);
 //                            <- To here -> 
@@ -1674,20 +1674,26 @@ module FPanel(){
 // - RPANEL
 module RPanel(){
 echo("START REAR PANEL ..."); 
-  panel_height = Box_Height - 2*Shield_thickness;
-  panel_length = Box_Width - 2*Shield_thickness;
+  panel_height = (Box_Height - 2*Shield_thickness) * fitting_factor;
+  panel_width = (Box_Width - 2*Shield_thickness) * fitting_factor;
+  panel_thick = panel_thickness * fitting_factor;
+ 
+echo("** panel_height = ", panel_height);
+echo("** panel_width = ", panel_width);
+echo("** panel_thick = ", panel_thick);
+   
     // Items' positions must be referenced from the outside of the enclosure.
 
 rotate([0, 180 , 0]) {
   difference(){
       union(){
     rotate([90, 0, 0])
-      rounded_polig4([panel_thickness, panel_length, panel_height], Fillet);
+      rounded_polig4([panel_thick, panel_width, panel_height], Fillet);
 
     // Plug hole
           f = 1.75;
     translate([- 45, -30, 5])     
-      rounded_polig6(trapezoid_vertex(27.5*f, 19.4*f, 14*f, 12.4*f), 10, 2*f);
+      rounded_polig6(trapezoid_vertex(27.5*f, 19.5*f, 14*f, 12.5*f), 10, 2*f);
 
 
     // Switch hole
@@ -1709,37 +1715,37 @@ rotate([0, 180 , 0]) {
     
     // Plug hole
     translate([- 45, -30, 0]){     
-      rounded_polig6(trapezoid_vertex(27.5, 19.4, 14, 12.4), 20, 2);
+      rounded_polig6(trapezoid_vertex(27.5, 19.5, 14, 12.5), 20, 2);
     translate([- 20, 0, 0])     
-        cylinder(d = 3.5, h = 5*panel_thickness + 0.001, center = true);
+        cylinder(d = 3.5, h = 5*panel_thick + 0.001, center = true);
     translate([20, 0, 0])     
-        cylinder(d = 3.5, h = 5*panel_thickness + 0.001, center = true);
+        cylinder(d = 3.5, h = 5*panel_thick + 0.001, center = true);
     }
 
     // Switch hole
     translate([- 45, 30, 0])
-      cube([30.2, 22, 5*panel_thickness + 0.001], center = true);
+      cube([30.2, 22, 5*panel_thick + 0.001], center = true);
     translate([- 45, 30, 4])
       cube([30.2 + 4, 22 + 4, 6 + 0.001], center = true);
 
   // Fuse hole
   translate([- 45, 0, 0])
     intersection(){
-      cylinder(d = 16.13, h = 5*panel_thickness + 0.001, center = true);
-      cube([16.13, 13.97, 5*panel_thickness + 0.001], center = true);
+      cylinder(d = 16.13, h = 5*panel_thick + 0.001, center = true);
+      cube([16.13, 13.97, 5*panel_thick + 0.001], center = true);
     } //in
   translate([- 45, 0, 3])
     intersection(){
       cylinder(d = 16.13 + 6, h = 6, center = true);
-      cube([16.13+6, 13.97, 5*panel_thickness + 0.001], center = true);
+      cube([16.13+6, 13.97, 5*panel_thick + 0.001], center = true);
     } //in
 
   } //di
 
   if (RFan_Grill_item == 1){
-    translate([FanPosX + 15, FanPosY, -panel_thickness/2])
+    translate([FanPosX + 15, FanPosY, -panel_thick/2])
       rotate([0, 0, 0])    
-        Fan_grille(fan_active = 1, plate_thickness = panel_thickness); 
+        Fan_grille(fan_active = 1, plate_thickness = panel_thick); 
   }
   else 
     translate([FanPosX + 15, FanPosY, 0])
