@@ -93,11 +93,11 @@ BPCB3_item = 0;// [0:No, 1:Yes]
 // - Bottom PCB4
 BPCB4_item = 0;// [0:No, 1:Yes]
 // - Power Supply
-PS_item = 0;// [0:No, 1:Yes]
+PS_item = 1;// [0:No, 1:Yes]
 // - Pillar #1
-Pillar1_item = 0;// [0:No, 1:Yes]
+Pillar1_item = 1;// [0:No, 1:Yes]
 // - Pillar #2
-Pillar2_item = 0;// [0:No, 1:Yes]
+Pillar2_item = 1;// [0:No, 1:Yes]
 // - Pillar #3
 Pillar3_item = 0;// [0:No, 1:Yes]
 // - Pillar #4
@@ -310,7 +310,7 @@ FanLength       = 71.5;
 // - Largeur Fan - Fan Width
 FanWidth        = 71.5;
 // - Heuteur Fan - Fan height
-FanHeight      = 25.5;
+FanHeight      = 26;
 // - Heuteur pied - Feet height
 FanFootHeight      = 15;
 // - Diamètre pied - Foot diameter
