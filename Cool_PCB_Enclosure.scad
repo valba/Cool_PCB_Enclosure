@@ -175,11 +175,16 @@ PCBFootHole        = 3.5;
 
 // - Power Supply Heuteur pied - Power Supply Feet height
 PSF_Height = 25;
+// - Power Supply Feet external diameter
 PSF_ext_dia = 15;
+// - Power Supply Feet internal diameter
 PSF_int_dia = 3.5; // 6-32 UNC
+// - Power Supply Feet base hole diameter
 PSF_bh_dia = 7.5;
-PSF_bh_height = PSF_Height - 4;
+// - Power Supply Feet Fillet
 PSF_Fillet = 12;
+// - Power Supply Feet base hole height
+PSF_bh_height = PSF_Height - 4;
 
 
 // - Pillar height
@@ -527,8 +532,8 @@ echo("START RAILS ...");
 
       //internal rail
       difference(){        
-        external_box2 = [Box_Length - 2*rail_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness];
-        internal_box2 = [Box_Length - 4*rail_thickness - 2*Shield_thickness, Box_Width - 2*Shield_thickness + 0.001, Box_Height - 2*Shield_thickness + 0.001];
+        external_box2 = [Box_Length - 2*rail_thickness - 2*panel_thickness/fitting_factor, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness];
+        internal_box2 = [Box_Length - 4*rail_thickness - 2*panel_thickness/fitting_factor, Box_Width - 2*Shield_thickness + 0.001, Box_Height - 2*Shield_thickness + 0.001];
 
         rounded_polig4(external_box2, radius = Fillet);
         rounded_polig4(internal_box2, radius = Fillet);
@@ -550,9 +555,9 @@ module shield(){
     difference(){
       rounded_polig4(external_box1, radius = Fillet);
       rounded_polig4(internal_box1, radius = Fillet);
-      if (Ventilation_Active) flake_holes();
-      //ventilation_holes();
+      screw_holes();
       antipegs();
+      if (Ventilation_Active) flake_holes();
     } //di  
     panel_rails();
   } //un  
@@ -590,22 +595,23 @@ echo("START HEX MESH ...");
   hh = honeycomb_height;
   rt = rail_thickness;
   pt = panel_thickness;
+  ff = fitting_factor;
 echo ("Box_Width  ", Box_Width);
 internal_XPos = Box_Width - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness;
 
   internal_XPos = Box_Width - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness;
 //    h_area = [Box_Width - 2*Shield_thickness, Box_Length - 4*rt - 2*pt, hh];
-    h_area = [Box_Width - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt, hh];
+    h_area = [Box_Width - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt/ff, hh];
     echo(h_area);
   translate([0, 0, - Box_Height/2 + Shield_thickness + hh/2]) 
     hexagonal_grid(box = h_area, hexagon_diameter = (rhd - hht)/sin60, hexagon_thickness = hht);  
 
-    v_area1 = [Box_Height - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt, hh];
+    v_area1 = [Box_Height - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt/ff, hh];
 //    echo(v_area1);
   translate([ - Box_Width/2 + Shield_thickness + hh/2, 0, 0]) rotate([0, 90, 0]) 
     hexagonal_grid(box = v_area1, hexagon_diameter = 2/sqrt(3)*rhd - hht, hexagon_thickness = hht);
 
-    v_area2 = [Box_Height - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt, hh];
+    v_area2 = [Box_Height - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt/ff, hh];
   translate([Box_Width/2 - Shield_thickness - hh/2, 0, 0]) rotate([0, 90, 0]) 
     hexagonal_grid(box = v_area2, hexagon_diameter = 2/sqrt(3)*rhd - hht, hexagon_thickness = hht);
   echo("--> END HEX MESH");
@@ -677,27 +683,19 @@ echo("START ANTI-REEDS ...");
   // Reeds
   reed_length = Box_Length - 2*panel_thickness/fitting_factor - 4*rail_thickness;
   modulo = reed_length % reed_hexagon_diameter;
-  total_num = (reed_length - modulo) / reed_hexagon_diameter;
+  total_num = floor(reed_length/reed_hexagon_diameter);
+  half_num = floor(total_num/2);
+  half_screws = floor(n_screws/2);
+  step = floor(half_num/half_screws);
   difference() {        // Fixation box legs
     union() {
       for (i = [1 : total_num]) {
         //color("red") 
         translate([(Box_Width)/2 - Shield_thickness - reed_thickness/2, (reed_length - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter , 0])
-// cube([reed_thickness, reed_hexagon_diameter * total_num, reed_hexagon_diameter], center = true );
-                   rotate([90, 0, 90])
- //           difference() {
-              cylinder(d = reed_hexagon_diameter + honeycomb_hexagon_thickness, h = reed_thickness, center = true, $fn=6);
- //             if ( (i == 1) || (i == total_num) || (i == (total_num - total_num%2)/2 + 1) ) {  
-   //             translate ([0, 4, 0]) cylinder(d = lateral_screw_diameter, h = reed_thickness, center = true, $fn=Resolution);
-   //           }
-    //        } //di
+          rotate([90, 0, 90])
+              cylinder(d = reed_hexagon_diameter + 0.001, h = reed_thickness, center = true, $fn=6);
       } //fo
     } //un
-//    angle = atan(2*reed_thickness / reed_hexagon_diameter);  
-//    translate([ - Box_Width/2 + Shield_thickness + reed_thickness/2, 0, - reed_hexagon_diameter/2])
-      //color("blue")
-//      rotate([0, angle, 0]) 
-//        cube([reed_thickness, (reed_length - modulo), reed_hexagon_diameter], center = true);
   }//di (Fixation box legs)
 echo("--> END ANTI-REEDS"); 
 } //mo
@@ -772,6 +770,45 @@ echo("--> END ANTI-PEGS");
 } //mo
 
 
+module screw_holes() {
+  // Lateral screws
+  reed_length = Box_Length - 2*panel_thickness/fitting_factor - 4*rail_thickness;
+  modulo = reed_length % reed_hexagon_diameter;
+  total_num = floor(reed_length/reed_hexagon_diameter);
+  half_num = floor(total_num/2);
+  half_screws = floor(n_screws/2);
+  step = floor(half_num/half_screws);
+  if (Lateral_Screws_Active) {
+    starting_point = (total_num % 2 == 0) ? (n_screws % 2 == 0 ? -reed_hexagon_diameter/2 : -reed_hexagon_diameter/2) : 0; 
+    nl_screws = (total_num % 2 == 0) ? (n_screws % 2 == 0 ? n_screws : n_screws - 1) : n_screws;
+    color("red") 
+      union() {
+        for (j = [step : step : half_num - step]) {
+              translate([Box_Width/2 - Shield_thickness/2, j * reed_hexagon_diameter + starting_point, - reed_hexagon_diameter * sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=Resolution); 
+              translate([Box_Width/2 - Shield_thickness/2, - j * reed_hexagon_diameter - starting_point, - reed_hexagon_diameter * sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=Resolution); 
+        } //fo
+      // center one
+      if (nl_screws % 2 != 0)  
+        translate([Box_Width/2 - Shield_thickness/2, 0, -reed_hexagon_diameter*sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=Resolution); 
+      // first one
+      translate([Box_Width/2 - Shield_thickness/2, (reed_length - modulo - reed_hexagon_diameter)/2, -reed_hexagon_diameter*sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=Resolution);         
+      // last one
+      translate([Box_Width/2 - Shield_thickness/2, (reed_length - modulo - reed_hexagon_diameter)/2 - (total_num - 1) * reed_hexagon_diameter, -reed_hexagon_diameter*sin60/4])
+               rotate([90, 0, 90])
+                 cylinder(d = lateral_screw_diameter, h = 2*Shield_thickness, center = true, $fn=Resolution);         
+      } //un
+   }     
+} //mo
+
+
 module flake_holes () {
   posX = (Box_Width - Shield_thickness)/2;
   posY = Box_Length/4;
@@ -788,7 +825,6 @@ module flake_holes () {
     rotate([0, 90, 0]) ventilation_flake(diameter = flake_dia, thickness = flake_thick, height = flake_height);
   translate([ posX, posY, - posZ])
     rotate([0, 90, 0]) ventilation_flake(diameter = flake_dia, thickness = flake_thick, height = flake_height);
-
 } //mo
 
 module ventilation_holes(){      
@@ -1285,7 +1321,7 @@ module tshield(top_active, top_visible) {
           //Fan Hole
           if (TFan_Grill_item == 1) {
             translate([FanPosX,  FanPosY, - Box_Height/2])
-            cylinder(r = FanDia/2, h = 2*Shield_thickness);
+            cylinder(r = FanDia/2, h = 2*(Shield_thickness + honeycomb_height));
           }
         } //di
         reeds();
@@ -1321,7 +1357,7 @@ module bshield(bottom_active, bottom_visible) {
         //Fan Hole
           if (BFan_Grill_item == 1) {
             translate([FanPosX,  FanPosY, - Box_Height/2])
-            cylinder(r = FanDia/2, h = 2*Shield_thickness);
+            cylinder(r = FanDia/2, h = 2*(Shield_thickness + honeycomb_height));
           }
         } //di
         reeds();
@@ -1959,7 +1995,7 @@ module tricell(diameter, thickness, height) {
 
 
 module ventilation_flake(diameter, thickness, height) {
-echo("START VENTILATION FLAKE ..."); 
+echo("START VENTILATION FLAKS ..."); 
   difference() {
     cylinder(d = 2*(diameter + thickness)+ thickness, h = height, center = true, $fn = 6);
     union(){
