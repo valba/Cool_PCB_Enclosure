@@ -1718,8 +1718,8 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
     v=[v0, v1, v2];
     deltaX = u[0]*v[0]+u[1]*v[1]+u[2]*v[2];    
 */
-    deltaX = oddX == 1 ? a/2 : 0;
-//    deltaX = oddX == 1 ? 0 : 0*d/2;
+    deltaX = oddX == 1 ? 0 : a/2 + d/2;
+//    deltaX = oddX == 1 ? a/2 : 0;
     deltaY = oddY == 1 ? 0 : a/2;
 
     x0 = (numberX + 2) * a/2 + deltaX;
