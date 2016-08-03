@@ -62,6 +62,8 @@ Box_Height = 105;
 Shield_thickness = 2;  
 // - Epaisseur rail - Rail thickness  
 rail_thickness = 4;
+// - Hauteur rail - Rail height from honeycomb  
+rail_height = 4;
 // - Epaisseur anche - Reed thickness  
 reed_thickness = 4;
 // - 
@@ -82,7 +84,7 @@ flake_dia = 10;
 // - Epaisseur flocon - Flake thickness
 flake_thick = 1;
 // - Flake height
-flake_height = Shield_thickness + 0.001;
+flake_height = Shield_thickness + honeycomb_height;
 // - M3 nut's diameter (accross corners)
 M3_dia = 6.1; // M3 standard = 6.01
 // - M3 nut's diameter (accross corners)
@@ -540,7 +542,7 @@ echo("START RAILS ...");
       } //di (internal rail)     
       
     } //un
-    internal_box3 = [Box_Length + 1, Box_Width - 2*Shield_thickness - 2*honeycomb_height, Box_Height - 2*Shield_thickness - 2*honeycomb_height];
+    internal_box3 = [Box_Length + 1, Box_Width - 2*Shield_thickness - 2*honeycomb_height - 2*rail_height, Box_Height - 2*Shield_thickness - 2*honeycomb_height - 2*rail_height];
     rounded_polig4(internal_box3, radius = Fillet);
   } //di        
 echo("--> END RAILS");
@@ -548,7 +550,6 @@ echo("--> END RAILS");
 
 
 module shield(){
-    
   union(){
     external_box1 = [Box_Length, Box_Width, Box_Height];
     internal_box1 = [Box_Length + 1, Box_Width - 2*Shield_thickness, Box_Height - 2*Shield_thickness];
@@ -558,7 +559,8 @@ module shield(){
       screw_holes();
       antipegs();
       if (Ventilation_Active) flake_holes();
-    } //di  
+    } //di
+    flakes();  
     panel_rails();
   } //un  
   
@@ -581,10 +583,9 @@ module shield(){
     for (i = [0 : 3] ){
       translate([internal_Pos[i][0], 0, internal_Pos[i][1]]) 
         rotate([90, 360/16, 0])
-          cylinder(r = Fillet + honeycomb_height/2, h = Box_Length + 1, center = true, $fn = 8);
+          cylinder(r = Fillet, h = Box_Length + 1, center = true, $fn = 8);
     } //fo
   } //di
-  
 } //mo
 
 
@@ -691,9 +692,9 @@ echo("START ANTI-REEDS ...");
     union() {
       for (i = [1 : total_num]) {
         //color("red") 
-        translate([(Box_Width)/2 - Shield_thickness - reed_thickness/2, (reed_length - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter , 0])
+        translate([(Box_Width)/2 - Shield_thickness - reed_thickness/2 - rail_height/2, (reed_length - modulo - reed_hexagon_diameter)/2 - (i - 1) * reed_hexagon_diameter , 0])
           rotate([90, 0, 90])
-              cylinder(d = reed_hexagon_diameter + 0.001, h = reed_thickness, center = true, $fn=6);
+              cylinder(d = reed_hexagon_diameter + 0.001, h = reed_thickness + rail_height, center = true, $fn=6);
       } //fo
     } //un
   }//di (Fixation box legs)
@@ -809,14 +810,14 @@ module screw_holes() {
 } //mo
 
 
-module flake_holes () {
-  posX = (Box_Width - Shield_thickness)/2;
+module flakes() {
+  posX = (Box_Width - flake_height)/2;
   posY = Box_Length/4;
   posZ = Box_Height/4;
 
   //posY = 150;
   //posZ = 23.923;
-    
+  union() {  
   translate([ - posX, - posY, - posZ])
     rotate([0, 90, 0]) ventilation_flake(diameter = flake_dia, thickness = flake_thick, height = flake_height);
   translate([ - posX, posY, - posZ])
@@ -825,6 +826,26 @@ module flake_holes () {
     rotate([0, 90, 0]) ventilation_flake(diameter = flake_dia, thickness = flake_thick, height = flake_height);
   translate([ posX, posY, - posZ])
     rotate([0, 90, 0]) ventilation_flake(diameter = flake_dia, thickness = flake_thick, height = flake_height);
+  }
+} //mo
+
+
+module flake_holes() {
+  posX = (Box_Width - flake_height)/2;
+  posY = Box_Length/4;
+  posZ = Box_Height/4;
+
+  //posY = 150;
+  //posZ = 23.923;
+    
+  translate([ - posX, - posY, - posZ])
+    rotate([0, 90, 0]) flake_hole(diameter = flake_dia, thickness = flake_thick, height = flake_height + 0.001);
+  translate([ - posX, posY, - posZ])
+    rotate([0, 90, 0]) flake_hole(diameter = flake_dia, thickness = flake_thick, height = flake_height + 0.001);
+  translate([ posX, - posY, - posZ])
+    rotate([0, 90, 0]) flake_hole(diameter = flake_dia, thickness = flake_thick, height = flake_height + 0.001);
+  translate([ posX, posY, - posZ])
+    rotate([0, 90, 0]) flake_hole(diameter = flake_dia, thickness = flake_thick, height = flake_height + 0.001);
 } //mo
 
 module ventilation_holes(){      
@@ -1995,8 +2016,8 @@ module tricell(diameter, thickness, height) {
 
 
 module ventilation_flake(diameter, thickness, height) {
-echo("START VENTILATION FLAKS ..."); 
-  difference() {
+echo("START VENTILATION FLAKES ..."); 
+  intersection() {
     cylinder(d = 2*(diameter + thickness)+ thickness, h = height, center = true, $fn = 6);
     union(){
       tricell(diameter, thickness, height);
@@ -2007,9 +2028,14 @@ echo("START VENTILATION FLAKS ...");
         out_tricell(diameter, thickness, height);
       hex_cell(d = 2*(diameter + thickness), t = thickness, h = height);
     } //un
-//    rounded_polig6(hexagon_vertices(r = (diameter + thickness)+ thickness/2), height = height, radius = ((diameter + thickness)+ thickness/2)/6);
+    rounded_polig6(hexagon_vertices(r = (diameter + thickness)+ thickness/2), height = height, radius = ((diameter + thickness)+ thickness/2)/6);
   } //di
-echo("---> END VENTILATION FLAKE"); 
+echo("---> END VENTILATION FLAKES"); 
+} //mo
+
+
+module flake_hole(diameter, thickness, height) {
+    rounded_polig6(hexagon_vertices(r = (diameter + thickness)+ thickness/2), height = height, radius = ((diameter + thickness)+ thickness/2)/6);
 } //mo
 
 // * END OF VENTILATION FLAKE
