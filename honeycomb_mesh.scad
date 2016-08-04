@@ -70,7 +70,7 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
 
     moduloX = (box[0] % (2*a*sin60));
 //    numX = (box[0] - moduloX) / a;
-    numX =  floor(box[0] / a);
+    numX =  floor(box[0] / (2*a*sin60));
     oddX = numX % 2;
     numberX = numX;
 
