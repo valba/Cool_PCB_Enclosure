@@ -16,15 +16,18 @@
 //---------------------------------------------------------------
 
 // - honeycomb length
-hc_length = 244;
+hc_length = 224;
 // - honeycomb width
-hc_width = 172;
+hc_width = 182;
 // - honeycomb height
 hc_height = 3;
 // - hexagon hole diameter
 hexagon_diameter = 20;
 // - hexagon frame thickness
 hexagon_thickness = 2;
+
+
+/* [HIDDEN] */
 
 box = [hc_width, hc_length, hc_height];
 
@@ -59,17 +62,15 @@ module hex_hole(hexdiameter, height){
 }
 
 
-
-
 module hexgrid(box, hexagon_diameter, hexagon_thickness) {
     cos60 = cos(60);
     sin60 = sin(60);
     d = hexagon_diameter + hexagon_thickness;
     a = d*sin60;
 
-    moduloX = (box[0] % a);
+    moduloX = (box[0] % (2*a*sin60));
 //    numX = (box[0] - moduloX) / a;
-    numX =  floor(box[0]/a);
+    numX =  floor(box[0] / a);
     oddX = numX % 2;
     numberX = numX;
 
@@ -78,21 +79,19 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
     numY =  floor(box[1]/a);
     oddY = numY % 2;
     numberY = numY;
-    
 
-// Center the central hexagon on the origin of coordinates    
-    deltaX = oddX == 1 ? d/2 : a/2 + d/2;
-    deltaY = oddY == 1 ? 0 : a/2;
+// Center the central hexagon on the origin of coordinates
+    deltaY = oddY == 1 ? a/2 : 0;
 
-    x0 = (numberX + 2) * a/2 + deltaX;
+    x0 = (numberX + 2) * 2*a*sin60;
     y0 = (numberY + 2) * a/2 + deltaY;
 
     for(x = [ -x0: 2*a*sin60 : x0]) {
         for(y = [ -y0 : a : y0]) {
             translate([x, y, 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2] + 0.001);
            translate([x + a*sin60, y + a*cos60 , 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2] + 0.001);
- echo ([x, y]);
- echo ([x + a*sin60, y + a*cos60]);
+// echo ([x, y]);
+// echo ([x + a*sin60, y + a*cos60]);
             
          } //fo
     } //fo
