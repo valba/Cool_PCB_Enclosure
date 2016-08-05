@@ -76,6 +76,9 @@ honeycomb_height = 4;
 n_screws = 4;
 // -
 lateral_screw_diameter = 1.3;
+// - Displacement of hexagonal mesh in vertical walls in case antireed leaves the area too unmeshed. (rhd+hht)/2 = (reed_hexagon_diameter + honeycomb_hexagon_thickness)/2
+// - Hexagonal mesh displacement range: [ -(rhd+hht)/2, (rhd+hht)/2] 
+deltaH = 0; 
 
   
 /* [EXTERNAL_BOX_PARAMETERS) ] */
@@ -173,7 +176,6 @@ PCBFootHeight      = 15;
 PCBFootDia         = 10;
 // - Diamètre trou - Hole diameter
 PCBFootHole        = 3.5;  
-
 
 // - Power Supply Heuteur pied - Power Supply Feet height
 PSF_Height = 25;
@@ -607,13 +609,13 @@ internal_XPos = Box_Width - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness;
   translate([0, 0, - Box_Height/2 + Shield_thickness + hh/2]) 
     hexagonal_grid(box = h_area, hexagon_diameter = (rhd - hht)/sin60, hexagon_thickness = hht);  
 
-    v_area1 = [Box_Height - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt/ff, hh];
+    v_area1 = [2*deltaH + Box_Height - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt/ff, hh];
 //    echo(v_area1);
-  translate([ - Box_Width/2 + Shield_thickness + hh/2, 0, 0]) rotate([0, 90, 0]) 
+  translate([ - Box_Width/2 + Shield_thickness + hh/2, 0, deltaH]) rotate([0, 90, 0]) 
     hexagonal_grid(box = v_area1, hexagon_diameter = 2/sqrt(3)*rhd - hht, hexagon_thickness = hht);
 
-    v_area2 = [Box_Height - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt/ff, hh];
-  translate([Box_Width/2 - Shield_thickness - hh/2, 0, 0]) rotate([0, 90, 0]) 
+    v_area2 = [2*deltaH + Box_Height - 2*Fillet - 2*honeycomb_height - 2*Shield_thickness, Box_Length - 4*rt - 2*pt/ff, hh];
+  translate([Box_Width/2 - Shield_thickness - hh/2, 0,  deltaH]) rotate([0, 90, 0]) 
     hexagonal_grid(box = v_area2, hexagon_diameter = 2/sqrt(3)*rhd - hht, hexagon_thickness = hht);
   echo("--> END HEX MESH");
 } //mo            
@@ -1696,33 +1698,22 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
     d = hexagon_diameter + hexagon_thickness;
     a = d*sin60;
 
-    
-//    moduloX = (box[0] % (3*d));
-//    numX = (box[0] - moduloX) / (3*d);
-    moduloX = (box[0] % a);
-    numX = (box[0] - moduloX) / a;
+    moduloX = (box[0] % (2*a*sin60));
+//    numX = (box[0] - moduloX) / a;
+    numX =  floor(box[0] / (2*a*sin60));
     oddX = numX % 2;
     numberX = numX;
 
     moduloY = (box[1] % a);
-    numY = (box[1] - moduloY) / a;
+//    numY = (box[1] - moduloY) / a;
+    numY =  floor(box[1]/a);
     oddY = numY % 2;
     numberY = numY;
     
+// Center the central hexagon on the origin of coordinates
+    deltaY = oddY == 1 ? a/2 : 0;
 
-// Center the central hexagon on the origin of coordinates    
-/*    u = [0, a/2, -a/2];
-    v0 = numX % 2 == 1 ? 1 : 0;
-    v1 = numX % 2 == 2 ? 1 : 0;
-    v2 = numX % 2 == 0 ? 1 : 0;
-    v=[v0, v1, v2];
-    deltaX = u[0]*v[0]+u[1]*v[1]+u[2]*v[2];    
-*/
-    deltaX = oddX == 1 ? 0 : a/2 + d/2;
-//    deltaX = oddX == 1 ? a/2 : 0;
-    deltaY = oddY == 1 ? 0 : a/2;
-
-    x0 = (numberX + 2) * a/2 + deltaX;
+    x0 = (numberX + 2) * 2*a*sin60;
     y0 = (numberY + 2) * a/2 + deltaY;
 
     for(x = [ -x0: 2*a*sin60 : x0]) {
