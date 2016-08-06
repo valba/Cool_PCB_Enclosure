@@ -46,7 +46,7 @@ Honeycomb_Active = 1;// [0:No, 1:Yes]
 
 /* [VISIBILITY] */
 // - InternalBox Visibility
-InternalBox_Visible = 0;// [0:No, 1:Yes]
+InternalBox_Visible = 1;// [0:No, 1:Yes]
 // - CounterShield Visibility
 CounterShield_Visible = 0;// [0:No, 1:Yes]
 // - Panel Visibility
@@ -485,26 +485,31 @@ FanH = FanHeight;
 
 // PANELS VISIBILITY
 if (Panel_Active == 1) {
-  if  (Panel_Type == 1) {
-    if (InternalBox_Visible == 1) 
-      front_panel(active = 1, visible = 1);
-    else
-      front_panel(active = 1, visible = 0);
-    
-    if (CounterShield_Visible == 1) 
-      %rear_panel(active = 1, visible = 0);
+  if  (Panel_Type == 1) 
+    front_panel(active = 1);
+  else
+    rear_panel(active = 1);
   }
+else {
+  if  (Panel_Type == 1) 
+    front_panel(active = 0);
+  else
+    rear_panel(active = 0);
+}
+
+/*
+    if (InternalBox_Visible == 1) 
   else {
     if (InternalBox_Visible == 1) 
       rear_panel(active = 1, visible = 1);
     else
       rear_panel(active = 1, visible = 0);       
     
-    if (CounterShield_Visible == 1) 
-      %front_panel(active = 1, visible = 0);
+    if (Panel_Visible == 1) 
+      %front_panel(active = 1, visible = 1);
   }
 }
-
+*/
 
 // SHIELDS VISIBILITY
 if (Shield_Active == 1) {
@@ -1035,7 +1040,7 @@ echo("START PS FEET ...");
   // PS FEET
   if (Shield_Type == 0) {
     // * Bottom    
-  if (InternalBox_Visible == 1) {
+  if ((InternalBox_Visible == 1) && (PS_item ==1)) {
   translate([PS_PosX, PS_PosY, - Box_Height/2 + PSF_Height + Shield_thickness + PS_box_height/2])   
     %cube ([PS_box_length, PS_box_width, PS_box_height], center = true);
   translate([PS_PosX, PS_PosY, - Box_Height/2 + PSF_Height + Shield_thickness + PS_box_height])   
@@ -1753,14 +1758,14 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
 
 // * PANELS
 // - FRONT PANEL
-module front_panel(active, visible) {
+module front_panel(active) {
   union() {
     if (active == 1)
       translate([0, - Box_Length/2 + rail_thickness + panel_thickness/2, 0]) 
         rotate([90, 0, 0])
         FPanel();
     else
-      if (visible == 1)
+      if (Panel_Visible == 1)
       translate([0, - Box_Length/2 + rail_thickness + panel_thickness/2, 0]) 
         rotate([90, 0, 0])
           %FPanel();
@@ -1769,14 +1774,14 @@ module front_panel(active, visible) {
 }
 
 // - REAR PANEL
-module rear_panel(active, RPanel_visible) {
+module rear_panel(active) {
   union() {
     if (active == 1)
       translate([0, Box_Length/2 - rail_thickness - panel_thickness/2, 0]) 
         rotate([ -90, 180, 0])
         RPanel();
     else
-      if (RPanel_visible == 1)
+      if (Panel_Visible == 1)
         translate([0, Box_Length/2 - rail_thickness - panel_thickness/2, 0]) 
         rotate([ -90, 180, 0])
           %RPanel();
