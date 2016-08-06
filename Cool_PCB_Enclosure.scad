@@ -32,7 +32,7 @@ Shield_Split_Part = 0;// [0:Rear, 1:Front]
 // - Panel
 Panel_Active = 0;// [0:No, 1:Yes]
 // - Panel Type 
-Panel_Type = 0;// [0:Rear, 1:Front]
+Panel_Type = 1;// [0:Rear, 1:Front]
 // - Lateral screws
 Lateral_Screws_Active = 1;// [0:No, 1:Yes]
 // - Decorations to ventilation holes
@@ -484,32 +484,10 @@ FanH = FanHeight;
 //---------------------------------------------------------------
 
 // PANELS VISIBILITY
-if (Panel_Active == 1) {
   if  (Panel_Type == 1) 
-    front_panel(active = 1);
+    front_panel();
   else
-    rear_panel(active = 1);
-  }
-else {
-  if  (Panel_Type == 1) 
-    front_panel(active = 0);
-  else
-    rear_panel(active = 0);
-}
-
-/*
-    if (InternalBox_Visible == 1) 
-  else {
-    if (InternalBox_Visible == 1) 
-      rear_panel(active = 1, visible = 1);
-    else
-      rear_panel(active = 1, visible = 0);       
-    
-    if (Panel_Visible == 1) 
-      %front_panel(active = 1, visible = 1);
-  }
-}
-*/
+    rear_panel();
 
 // SHIELDS VISIBILITY
 if (Shield_Active == 1) {
@@ -1711,56 +1689,53 @@ module hexagonal_grid(box, hexagon_diameter, hexagon_thickness) {
 
 
 module hex_hole(hexdiameter, height) {
-        translate([0, 0, 0]) rotate([0, 0, 0]) cylinder(d = hexdiameter, h = height, center = true, $fn = 6);
+  cylinder(d = hexdiameter, h = height, center = true, $fn = 6);
 }
 
 
 
 
 module hexgrid(box, hexagon_diameter, hexagon_thickness) {
-    cos60 = cos(60);
-    sin60 = sin(60);
-    d = hexagon_diameter + hexagon_thickness;
-    a = d*sin60;
+  cos60 = cos(60);
+  sin60 = sin(60);
+  d = hexagon_diameter + hexagon_thickness;
+  a = d*sin60;
 
-    moduloX = (box[0] % (2*a*sin60));
+  moduloX = (box[0] % (2*a*sin60));
 //    numX = (box[0] - moduloX) / a;
-    numX =  floor(box[0] / (2*a*sin60));
-    oddX = numX % 2;
-    numberX = numX;
+  numX =  floor(box[0] / (2*a*sin60));
+  oddX = numX % 2;
+  numberX = numX;
 
-    moduloY = (box[1] % a);
+  moduloY = (box[1] % a);
 //    numY = (box[1] - moduloY) / a;
-    numY =  floor(box[1]/a);
-    oddY = numY % 2;
-    numberY = numY;
+  numY =  floor(box[1]/a);
+  oddY = numY % 2;
+  numberY = numY;
     
 // Center the central hexagon on the origin of coordinates
-    deltaY = oddY == 1 ? a/2 : 0;
+  deltaY = oddY == 1 ? a/2 : 0;
 
-    x0 = (numberX + 2) * 2*a*sin60;
-    y0 = (numberY + 2) * a/2 + deltaY;
+  x0 = (numberX + 2) * 2*a*sin60;
+  y0 = (numberY + 2) * a/2 + deltaY;
 
-    for(x = [ -x0: 2*a*sin60 : x0]) {
-        for(y = [ -y0 : a : y0]) {
-            translate([x, y, 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2] + 0.001);
-           translate([x + a*sin60, y + a*cos60 , 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2] + 0.001);
- echo ([x, y]);
- echo ([x + a*sin60, y + a*cos60]);
-            
-         }
-    }
-}
-  //  hexagonal_grid([172, 244, 3], 20.7846, 2);
+  for(x = [ -x0: 2*a*sin60 : x0]) {
+    for(y = [ -y0 : a : y0]) {
+      translate([x, y, 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2] + 0.001);
+      translate([x + a*sin60, y + a*cos60 , 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2] + 0.001);
+      echo ([x, y]); // print coordinates for manual matching of ventilation flakes
+      echo ([x + a*sin60, y + a*cos60]); // print coordinates for manual matching of ventilation flakes
+    } //fo
+  } //fo
+} //mo
 
 // * END OF HONEYCOMB
 
-
 // * PANELS
 // - FRONT PANEL
-module front_panel(active) {
+module front_panel() {
   union() {
-    if (active == 1)
+    if (Panel_Active == 1)
       translate([0, - Box_Length/2 + rail_thickness + panel_thickness/2, 0]) 
         rotate([90, 0, 0])
         FPanel();
@@ -1774,9 +1749,9 @@ module front_panel(active) {
 }
 
 // - REAR PANEL
-module rear_panel(active) {
+module rear_panel() {
   union() {
-    if (active == 1)
+    if (Panel_Active == 1)
       translate([0, Box_Length/2 - rail_thickness - panel_thickness/2, 0]) 
         rotate([ -90, 180, 0])
         RPanel();
@@ -1794,49 +1769,37 @@ module rear_panel(active) {
 // - FPANEL
 module FPanel() {
   echo("START FRONT PANEL ..."); 
-    panel_height = (Box_Height - 2*Shield_thickness) * fitting_factor;
-    panel_width = (Box_Width - 2*Shield_thickness) * fitting_factor;
-    panel_thick = panel_thickness;
-   difference() {
-        color(Couleur2)
-        //Panel(Length,Width,Thick,Fillet);
-        //translate([0, 0, -panel_height/2]) 
-        rotate([90, 0, 0])
-        rounded_polig4([panel_thick, panel_width, panel_height], Fillet);
-    
-//    translate([0, 0, 0 ])
+  panel_height = (Box_Height - 2*Shield_thickness) * fitting_factor;
+  panel_width = (Box_Width - 2*Shield_thickness) * fitting_factor;
+  panel_thick = panel_thickness;
+  difference() {
+    rotate([90, 0, 0])
+      rounded_polig4([panel_thick, panel_width, panel_height], Fillet);
     rotate([0,0,0]) {
-        color(Couleur2) {
-//                     <- Cutting shapes from here ->  
-        SquareHole  (1, -68, -20, 15, 10, 1); //(On/Off, Xpos, Ypos, Length, Width, Fillet)
-        SquareHole  (1, -48, -20, 15, 10, 1);
-        SquareHole  (1, -28, -20, 15, 10, 1); 
-        CylinderHole(1, -68, -5, 8);       //(On/Off, Xpos, Ypos, Diameter)
-        CylinderHole(1, -48, -5, 8);
-        CylinderHole(1, -28, -5, 8);
-        SquareHole  (1, -panel_width/5, 14, 80, 20, 2);
-        CylinderHole(1, 0, -15, 10);
-        SquareHole  (1, 50, 0, 30, 40, 3);
-//                            <- To here -> 
-           }
-       }
-  }
+      SquareHole  (1, -68, -20, 15, 10, 1); //(On/Off, Xpos, Ypos, Length, Width, Fillet)
+      SquareHole  (1, -48, -20, 15, 10, 1);
+      SquareHole  (1, -28, -20, 15, 10, 1); 
+      CylinderHole(1, -68, -5, 8);       //(On/Off, Xpos, Ypos, Diameter)
+      CylinderHole(1, -48, -5, 8);
+      CylinderHole(1, -28, -5, 8);
+      SquareHole  (1, -panel_width/5, 14, 80, 20, 2);
+      CylinderHole(1, 0, -15, 10);
+      SquareHole  (1, 50, 0, 30, 40, 3);
+    } //ro
+  } //di
   echo("---> END FRONT PANEL"); 
 
-    color(Couleur1) {
-     // translate ([ -.5 - Width/2,0, -Height/2])
-        rotate([0, 0, 0]) {
-//                      <- Adding text from here ->          
-        LText(1, -60, 30, "Arial Black", 4, "Digital Screen");//(On/Off, Xpos, Ypos, "Font", Size, "Text")
-        LText(1, 40, 30, "Arial Black", 4, "Level");
-        LText(1, -68 - 1, -33, "Arial Black", 6, "1");
-        LText(1, -48 - 1, -33, "Arial Black", 6, "2");
-        LText(1, -28 - 1, -33, "Arial Black", 6, "3");
-        CText(1, 0, -15, "Arial Black", 4, 10, 180, 0, "1 . 2 . 3 . 4 . 5 . 6");//(On/Off, Xpos, Ypos, "Font", Size, Diameter, Arc(Deg), Starting Angle(Deg),"Text")
-//                            <- To here ->
-            }
-      }
-}
+  color(Couleur1) {
+    rotate([0, 0, 0]) {
+      LText(1, -60, 30, "Arial Black", 4, "Digital Screen");//(On/Off, Xpos, Ypos, "Font", Size, "Text")
+      LText(1, 40, 30, "Arial Black", 4, "Level");
+      LText(1, -68 - 1, -33, "Arial Black", 6, "1");
+      LText(1, -48 - 1, -33, "Arial Black", 6, "2");
+      LText(1, -28 - 1, -33, "Arial Black", 6, "3");
+      CText(1, 0, -15, "Arial Black", 4, 10, 180, 0, "1 . 2 . 3 . 4 . 5 . 6");//(On/Off, Xpos, Ypos, "Font", Size, Diameter, Arc(Deg), Starting Angle(Deg),"Text")
+    } //ro
+  } //co
+} //mo
 
 
 // - RPANEL
