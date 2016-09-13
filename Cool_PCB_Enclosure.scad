@@ -816,7 +816,8 @@ module flakes() {
   posZ = Box_Height/4;
 
   //posY = 150;
-  //posZ = 23.923;
+  //posZ = 23.923 + deltaH - honeycomb_hexagon_thickness/2;
+
   union() {  
   translate([ - posX, - posY, - posZ])
     rotate([0, 90, 0]) ventilation_flake(diameter = flake_dia, thickness = flake_thick, height = flake_height);
@@ -836,8 +837,8 @@ module flake_holes() {
   posZ = Box_Height/4;
 
   //posY = 150;
-  //posZ = 23.923 + deltaH; // numerical value must be selected from the output of the console ECHO; [posZ, posY].
-    
+  //posZ = 23.923 + deltaH - honeycomb_hexagon_thickness/2; // numerical value must be selected from the output of the console ECHO; [posZ, posY].
+   
   translate([ - posX, - posY, - posZ])
     rotate([0, 90, 0]) flake_hole(diameter = flake_dia, thickness = flake_thick, height = flake_height + 0.001);
   translate([ - posX, posY, - posZ])
@@ -1723,8 +1724,8 @@ module hexgrid(box, hexagon_diameter, hexagon_thickness) {
     for(y = [ -y0 : a : y0]) {
       translate([x, y, 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2] + 0.001);
       translate([x + a*sin60, y + a*cos60 , 0]) hex_hole(hexdiameter = hexagon_diameter, height = box[2] + 0.001);
-      echo ([x, y]); // print coordinates for manual matching of ventilation flakes
-      echo ([x + a*sin60, y + a*cos60]); // print coordinates for manual matching of ventilation flakes
+      echo ("[z, y] = ", [x, y]); // print coordinates for manual matching of ventilation flakes
+      echo ("[z, y] = ", [x + a*sin60, y + a*cos60]); // print coordinates for manual matching of ventilation flakes
     } //fo
   } //fo
 } //mo
@@ -1835,6 +1836,7 @@ echo("START REAR PANEL ...");
         }
     // Fuse block
         if (RFuse_item == 1) {
+          f = 1.5;
           translate([ - 45, 0, 5])
             intersection() {
               cylinder(d = 16.13*f, h = 10, center = true);
