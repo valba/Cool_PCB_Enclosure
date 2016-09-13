@@ -34,7 +34,7 @@ function square_vertices(x, y) = [[ -x/2, -y/2, 0], [ -x/2, y/2, 0], [x/2, y/2, 
     for (i = [0 : 3] ){
       translate([internal_Pos[i][0], 0, internal_Pos[i][1]]) 
         rotate([90, 360/16, 0])
-          cylinder(r = Fillet + honeycomb_height/2, h = Box_Length + 1, center = true, $fn = 8);
+          cylinder(r = Fillet, h = Box_Length + 1, center = true, $fn = 8);
     } //fo
   } //di
   
